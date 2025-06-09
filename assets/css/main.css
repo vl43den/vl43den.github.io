@@ -4,9 +4,9 @@ html, body {
   padding: 0;
   height: 100%;
   /* Allow the animated canvas to show through */
-  background: transparent;
+  background: #000;
   color: #fff;
-  font-family: sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 /* 2) Canvas: full-screen, at the very back */
@@ -26,7 +26,7 @@ canvas#canvas {
   top: 0; left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.3);  /* play with this alpha */
+  background: rgba(0,0,0,0.2);  /* play with this alpha */
   z-index: -1;
   pointer-events: none;          /* let clicks through */
 }
@@ -64,4 +64,30 @@ footer {
   text-align: center;
   padding: 1rem 0;
   background: rgba(0,0,0,0.6);
+}
+
+/* 7) Widgets on the home page */
+.widgets {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-around;
+  margin-top: 2rem;
+}
+.widget {
+  background: rgba(255,255,255,0.1);
+  padding: 2rem;
+  border-radius: 8px;
+  flex: 1;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+.widget a {
+  color: #9cf;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+.widget:hover {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
 }

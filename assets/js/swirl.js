@@ -14,9 +14,9 @@
   const particles = Array.from({ length: 400 }, () => ({ x: Math.random() * w, y: Math.random() * h }));
 
   function animate() {
-    // Clear with transparency instead of a dark overlay so the
-    // underlying page shows through.
-    ctx.clearRect(0, 0, w, h);
+    // Darken slightly each frame for long trailing swirls
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+    ctx.fillRect(0, 0, w, h);
 
     ctx.fillStyle = '#fff';
     particles.forEach(p => {

@@ -25,7 +25,7 @@ canvas#canvas {
   max-width: 800px;
   margin: 5rem auto 2rem;
   padding: 2rem;
-  background: rgba(0, 0, 0, 0.5);
+  background: transparent;
   border-radius: 4px;
 }
 

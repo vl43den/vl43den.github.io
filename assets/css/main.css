@@ -1,0 +1,10 @@
+/* Reset & swirly background */
+html, body { margin:0; padding:0; height:100%; background:#000; color:#eee; }
+canvas#canvas { position: fixed; top:0; left:0; width:100vw; height:100vh; z-index:-1; }
+
+/* Content styling */
+.page-content { position: relative; z-index:1; max-width:700px; margin:0 auto; padding:2rem; font-family:sans-serif; }
+header nav a { margin-right:1rem; color:#9cf; text-decoration:none; }
+.hero-intro p { font-size:1.2rem; }
+.latest-posts ul, .projects-preview ul { list-style:none; padding:0; }
+.latest-posts li, .projects-preview li { margin-bottom:0.5rem; }

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Vl43den’s Swirl Site</title>
+  <style>
+    /* reset + full-screen canvas */
+    html, body { margin: 0; padding: 0; height: 100%; }
+    canvas#canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      display: block;
+      z-index: -1;      /* behind content */
+    }
+    #content {
+      position: relative;
+      z-index: 1;
+      padding: 2rem;
+      font-family: sans-serif;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1) Our swirl canvas -->
+  <canvas id="canvas"></canvas>
+
+  <!-- 2) Your page content -->
+  <div id="content">
+    <h1>Welcome!</h1>
+    <p>This site has a working swirl effect behind everything.</p>
+  </div>
+
+  <!-- 3) Simplex‐Noise library from CDN -->
+  <script src="https://unpkg.com/simplex-noise@2.4.0/simplex-noise.js"></script>
+  <!-- 4) Your swirl code -->
+  <script src="assets/js/swirl.js"></script>
+</body>
+</html>

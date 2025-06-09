@@ -1,0 +1,32 @@
+title: "Vl43den’s CTF & Projects"
+description: "Write-ups, tutorials, and side‑projects"
+baseurl: ""            # no subpath
+url: "https://vl43den.github.io"
+
+# Collections
+collections:
+  projects:
+    output: true
+    permalink: /projects/:path/
+
+markdown: kramdown
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-paginate
+paginate: 5
+
+# Defaults for posts & projects
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: post
+  - scope:
+      path: ""
+      type: "projects"
+    values:
+      layout: project

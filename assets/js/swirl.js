@@ -14,9 +14,8 @@
   const particles = Array.from({ length: 400 }, () => ({ x: Math.random() * w, y: Math.random() * h }));
 
   function animate() {
-    // Darken slightly each frame so the trails cover the whole screen
-    ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = 'rgba(0,0,0,0.01)'; // even lighter so trails stay visible
+    // Darken slightly each frame so the trails linger across the screen
+    ctx.fillStyle = 'rgba(0,0,0,0.05)'; // darker fade for persistent trails
     ctx.fillRect(0, 0, w, h);
 
     ctx.fillStyle = '#fff';

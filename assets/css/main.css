@@ -74,7 +74,8 @@ footer {
   margin-top: 2rem;
 }
 .widget {
-  background: rgba(255,255,255,0.1);
+  background: #fff;
+  color: #000;
   padding: 2rem;
   border-radius: 8px;
   flex: 1;
@@ -83,11 +84,12 @@ footer {
   cursor: pointer;
 }
 .widget a {
-  color: #9cf;
+  color: #000;
   text-decoration: none;
   font-weight: bold;
   font-size: 1.2rem;
 }
 .widget:hover {
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.4);
 }

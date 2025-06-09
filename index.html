@@ -3,38 +3,33 @@ layout: default
 title: Home
 ---
 
-<div id="content">
-  <h1>Welcome to my CTF write-ups!</h1>
-  <p>This site has a working swirl effect behind everything.</p>
+<div class="page-content">
+  <h1>My CTF Write-Ups & Projects</h1>
 
   <section>
-    <h2>Latest Write-ups</h2>
+    <h2>Write-Ups</h2>
     <ul>
-      {% for post in site.posts limit:5 %}
+      {% for post in site.posts %}
         <li>
           <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
           <small>— {{ post.date | date: "%B %-d, %Y" }}</small>
         </li>
       {% endfor %}
-      {% if site.posts | size == 0 %}
-        <li>No write-ups yet. Check back soon!</li>
+      {% if site.posts == empty %}
+        <li>No write-ups yet.</li>
       {% endif %}
     </ul>
-    <p><a href="{{ '/blog/' | relative_url }}">See all write-ups →</a></p>
   </section>
 
   <section>
     <h2>Projects</h2>
     <ul>
       {% for proj in site.projects %}
-        <li>
-          <a href="{{ proj.url | relative_url }}">{{ proj.title }}</a>
-        </li>
+        <li><a href="{{ proj.url | relative_url }}">{{ proj.title }}</a></li>
       {% endfor %}
-      {% if site.projects | size == 0 %}
-        <li>No projects listed yet.</li>
+      {% if site.projects == empty %}
+        <li>No projects yet.</li>
       {% endif %}
     </ul>
-    <p><a href="{{ '/projects/' | relative_url }}">See all projects →</a></p>
   </section>
 </div>

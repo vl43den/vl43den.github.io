@@ -4,16 +4,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>{{ page.title | default: site.title }}</title>
-  {% seo %}
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
 </head>
 <body>
+  <!-- 1) Swirl canvas -->
   <canvas id="canvas"></canvas>
+
+  <!-- 2) Header -->
   {% include header.html %}
+
+  <!-- 3) Your page’s content -->
   <main class="page-content">
     {{ content }}
   </main>
+
+  <!-- 4) Footer -->
   {% include footer.html %}
+
+  <!-- 5) Swirl scripts -->
   <script src="https://unpkg.com/simplex-noise@2.4.0/simplex-noise.js"></script>
   <script src="{{ '/assets/js/swirl.js' | relative_url }}"></script>
 </body>

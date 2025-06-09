@@ -1,42 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Vl43den’s Swirl Site</title>
-  <style>
-    /* reset + full-screen canvas */
-    html, body { margin: 0; padding: 0; height: 100%; }
-    canvas#canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      display: block;
-      z-index: -1;      /* behind content */
-    }
-    #content {
-      position: relative;
-      z-index: 1;
-      padding: 2rem;
-      font-family: sans-serif;
-      color: #fff;
-    }
-  </style>
-</head>
-<body>
+---
+layout: default
+title: Home
+---
 
-  <!-- 1) Our swirl canvas -->
-  <canvas id="canvas"></canvas>
+<div id="content">
+  <h1>Welcome to my CTF write-ups!</h1>
+  <p>This site has a working swirl effect behind everything.</p>
 
-  <!-- 2) Your page content -->
-  <div id="content">
-    <h1>Welcome!</h1>
-    <p>This site has a working swirl effect behind everything.</p>
-  </div>
+  <section>
+    <h2>Latest Write-ups</h2>
+    <ul>
+      {% for post in site.posts limit:5 %}
+        <li>
+          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+          <small>— {{ post.date | date: "%B %-d, %Y" }}</small>
+        </li>
+      {% endfor %}
+      {% if site.posts | size == 0 %}
+        <li>No write-ups yet. Check back soon!</li>
+      {% endif %}
+    </ul>
+    <p><a href="{{ '/blog/' | relative_url }}">See all write-ups →</a></p>
+  </section>
 
-  <!-- 3) Simplex‐Noise library from CDN -->
-  <script src="https://unpkg.com/simplex-noise@2.4.0/simplex-noise.js"></script>
-  <!-- 4) Your swirl code -->
-  <script src="assets/js/swirl.js"></script>
-</body>
-</html>
+  <section>
+    <h2>Projects</h2>
+    <ul>
+      {% for proj in site.projects %}
+        <li>
+          <a href="{{ proj.url | relative_url }}">{{ proj.title }}</a>
+        </li>
+      {% endfor %}
+      {% if site.projects | size == 0 %}
+        <li>No projects listed yet.</li>
+      {% endif %}
+    </ul>
+    <p><a href="{{ '/projects/' | relative_url }}">See all projects →</a></p>
+  </section>
+</div>

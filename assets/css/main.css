@@ -1,41 +1,42 @@
-/* 1) Reset + background */
+/* 1) Reset + base colors */
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   background: #000;
   color: #fff;
+  font-family: sans-serif;
 }
 
-/* 2) Swirl canvas fills the viewport, behind everything */
+/* 2) Canvas: full-screen, at the very back */
 canvas#canvas {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
+  z-index: -2;
   display: block;
+}
+
+/* 3) Overlay: subtle tint above the swirl */
+.overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.3);  /* play with this alpha */
   z-index: -1;
+  pointer-events: none;          /* let clicks through */
 }
 
-/* 3) Your content wrapper: sits above the canvas */
-.page-content {
-  position: relative;
-  z-index: 1;
-  max-width: 800px;
-  margin: 5rem auto 2rem;
-  padding: 2rem;
-  background: transparent;
-  border-radius: 4px;
-}
-
-/* 4) Header styling */
+/* 4) Header: sits on top of overlay + swirl */
 header {
   position: fixed;
+  top: 0; left: 0;
   width: 100%;
-  top: 0;
-  background: rgba(0,0,0,0.6);
   padding: 1rem;
+  background: rgba(0,0,0,0.6);
   z-index: 2;
 }
 header nav a {
@@ -44,11 +45,22 @@ header nav a {
   text-decoration: none;
 }
 
-/* 5) Footer styling */
+/* 5) Main page content: fully transparent so swirl & overlay show through */
+.page-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 5rem auto 2rem;
+  padding: 2rem;
+  background: transparent;
+  border-radius: 4px;
+}
+
+/* 6) Footer: above everything except header */
 footer {
+  position: relative;
+  z-index: 2;
   text-align: center;
   padding: 1rem 0;
   background: rgba(0,0,0,0.6);
-  position: relative;
-  z-index: 2;
 }

@@ -74,7 +74,7 @@ footer {
   margin-top: 2rem;
 }
 .widget {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.9); /* allow swirls to subtly show through */
   color: #000;
   padding: 2rem;
   border-radius: 8px;
@@ -92,4 +92,15 @@ footer {
 .widget:hover {
   transform: translateY(-5px) scale(1.05);
   box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+}
+
+/* 8) Responsive adjustments */
+@media (max-width: 600px) {
+  .widgets {
+    flex-direction: column;
+  }
+  .widget {
+    flex: none;
+    width: 100%;
+  }
 }

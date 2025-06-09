@@ -1,5 +1,5 @@
 /* Reset & swirly background */
-html, body { margin:0; padding:0; height:100%; background:#000; color:#fff; font-family:'Inter', sans-serif; }
+html, body { margin:0; padding:0; height:100%; background:transparent; color:#fff; font-family:'Inter', sans-serif; }
 canvas#canvas { position: fixed; top:0; left:0; width:100vw; height:100vh; z-index:-2; display:block; }
 
 /* Overlay tint above the swirl */

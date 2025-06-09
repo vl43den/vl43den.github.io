@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TJCTF Audio Steganography Challenge"
+title:  "TJCTF Challenge /forensics/album-cover - Hidden Message in Audio"
 date:   2025-06-09 14:30:00 +00:00
 tags:   [forensics, audio, steganography, ctf, tjctf]
 ---
@@ -9,16 +9,35 @@ tags:   [forensics, audio, steganography, ctf, tjctf]
 
 ## Challenge Overview
 
-**Challenge Name:** Sound Secrets  
-**Category:** Forensics/Steganography  
-**Points:** 250  
-**Description:** *"We intercepted this audio file from an agent, but it sounds like regular noise. Our intelligence suggests there might be a hidden message inside. Can you recover the flag?"*
+**Challenge Name:** forensics/album  
+**Category:** Forensics/Steganography   
+**Description:** *"i heard theres a cool easter egg in the new tjcsc album cover"*
 
 ## Initial Analysis
 
-When I first downloaded the challenge file (`recovered_flag.wav`), I opened it with an audio player. As mentioned in the challenge description, it sounded like regular noise without any obvious patterns or messages. This immediately suggested that the flag wasn't hidden in the audible content itself but likely concealed using steganography techniques.
+When I first downloaded the challenge file (`albumcover.png`), I was wondering how to extract information from the PNG. As mentioned in the challenge description, there should be an easter egg embedded in the TJCSC album cover - this immediately suggested some form of steganography.
+
+After examining the file properties, I tried various steganography tools like Stegsolve, binwalk, and exiftool to see if there was any hidden data.
+
+```bash
+# First, check file type
+file albumcover.png
+# Output: PNG image data, 800 x 800, ...
+
+# Check for embedded files with binwalk
+binwalk albumcover.png
+# Output: showed signs of embedded WAV audio data!
+
+# Extract embedded content
+binwalk -e albumcover.png
+# This extracted a WAV file from the image
+```
+
+I discovered that an audio file was embedded within the PNG image! This is a common steganography technique where one file format can be hidden within another. The challenge creators had hidden a WAV audio file inside the PNG image.
 
 ## Understanding Audio Steganography
+
+After extracting the WAV file (let's call it `recovered_flag.wav`), I played it but only heard what seemed like random noise. This suggested deeper steganography within the audio file itself.
 
 Audio steganography is the practice of hiding data within audio files. Common techniques include:
 
@@ -27,16 +46,18 @@ Audio steganography is the practice of hiding data within audio files. Common te
 3. **Echo hiding**
 4. **Spectral analysis** - hiding information in the frequency spectrum
 
-Given that the audio sounded like noise, I suspected that visual inspection of the audio might reveal patterns not discernible to the human ear.
+Given that the audio sounded like noise, I suspected that the message might be hidden in the frequency domain rather than the time domain - making spectral analysis the next logical approach.
 
 ## Tools and Approach
 
-I decided to use Python with libraries specialized for audio analysis:
+After discovering the hidden audio file, I decided to use Python with libraries specialized for audio analysis:
 - `numpy` for numerical operations
 - `matplotlib` for visualization
 - `wave` for handling WAV audio files
 
 My approach was to generate a spectrogram of the audio file. A spectrogram is a visual representation of the spectrum of frequencies as they vary with time, allowing us to see patterns that we can't hear.
+
+This technique is commonly used in audio steganography - text or images can be embedded in an audio file in such a way that they're invisible when listening to the audio but become visible when viewing the audio's frequency spectrum.
 
 ## The Solution
 
@@ -47,8 +68,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import wave
 
-# Load the WAV file
-with wave.open('/mnt/data/recovered_flag.wav', 'rb') as wf:
+# Load the WAV file extracted from the PNG
+with wave.open('_extracted_albumcover/recovered_flag.wav', 'rb') as wf:
     sr = wf.getframerate()
     nframes = wf.getnframes()
     audio = np.frombuffer(wf.readframes(nframes), dtype=np.int16)
@@ -63,9 +84,9 @@ plt.colorbar(label='Intensity (dB)')
 plt.tight_layout()
 
 # Save the spectrogram as an image for inspection
-spec_path = '/mnt/data/spectrogram.png'
+spec_path = 'spectrogram.png'
 plt.savefig(spec_path, dpi=150)
-spec_path
+plt.show()  # Also display it immediately
 ```
 
 When I ran this code and examined the resulting spectrogram, I was amazed to see text appear in the frequency domain! The spectrogram clearly showed the flag:

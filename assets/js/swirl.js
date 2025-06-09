@@ -11,12 +11,7 @@
   resize();
 
   const noise = new SimplexNoise();
-
-  function spawn() {
-    return { x: Math.random() * w, y: Math.random() * h, life: 0 };
-  }
-
-  const particles = Array.from({ length: 150 }, () => spawn());
+  const particles = Array.from({ length: 400 }, () => ({ x: Math.random() * w, y: Math.random() * h }));
 
   function animate() {
     ctx.fillStyle = 'rgba(0,0,0,0.02)';
@@ -27,8 +22,10 @@
       const angle = noise.noise2D(p.x * 0.002, p.y * 0.002) * Math.PI * 2;
       p.x += Math.cos(angle);
       p.y += Math.sin(angle);
-      p.life++;
-      if (p.life > 200) Object.assign(p, spawn());
+      if (p.x < 0) p.x = w;
+      if (p.x > w) p.x = 0;
+      if (p.y < 0) p.y = h;
+      if (p.y > h) p.y = 0;
       ctx.fillRect(p.x, p.y, 1, 1);
     });
 

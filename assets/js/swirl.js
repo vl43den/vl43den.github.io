@@ -15,6 +15,7 @@
 
   function animate() {
     // Darken slightly each frame so the trails cover the whole screen
+    ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = 'rgba(0,0,0,0.03)'; // slower fading for longer trails
     ctx.fillRect(0, 0, w, h);
 

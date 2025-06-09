@@ -14,6 +14,7 @@
   const particles = Array.from({ length: 400 }, () => ({ x: Math.random() * w, y: Math.random() * h }));
 
   function animate() {
+    ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = 'rgba(0,0,0,0.03)';
     ctx.fillRect(0, 0, w, h);
 

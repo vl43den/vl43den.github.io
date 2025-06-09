@@ -4,7 +4,7 @@ html, body {
   padding: 0;
   height: 100%;
   /* Allow the animated canvas to show through */
-  background: #000;
+  background: transparent;
   color: #fff;
   font-family: 'Inter', sans-serif;
 }

@@ -26,7 +26,7 @@ canvas#canvas {
   top: 0; left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.2);  /* play with this alpha */
+  background: rgba(0,0,0,0.1);  /* lighter tint so swirls show more */
   z-index: -1;
   pointer-events: none;          /* let clicks through */
 }
@@ -37,7 +37,7 @@ header {
   top: 0; left: 0;
   width: 100%;
   padding: 1rem;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.3); /* more see-through */
   z-index: 2;
 }
 header nav a {
@@ -63,7 +63,7 @@ footer {
   z-index: 2;
   text-align: center;
   padding: 1rem 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.3); /* more see-through */
 }
 
 /* 7) Widgets on the home page */

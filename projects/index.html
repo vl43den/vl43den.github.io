@@ -1,0 +1,14 @@
+---
+layout: default
+title: Projects
+---
+
+<h1>Projects</h1>
+<ul>
+  {% for proj in site.projects %}
+    <li><a href="{{ proj.url | relative_url }}">{{ proj.title }}</a></li>
+  {% endfor %}
+  {% if site.projects == empty %}
+    <li>No projects yet.</li>
+  {% endif %}
+</ul>

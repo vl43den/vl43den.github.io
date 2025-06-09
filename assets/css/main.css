@@ -26,7 +26,7 @@ canvas#canvas {
   top: 0; left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.1);  /* lighter tint so swirls show more */
+  background: transparent;       /* let swirls show fully */
   z-index: -1;
   pointer-events: none;          /* let clicks through */
 }
@@ -69,13 +69,14 @@ footer {
 /* 7) Widgets on the home page */
 .widgets {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
-  justify-content: space-around;
+  justify-content: center;
   margin-top: 2rem;
 }
 .widget {
-  background: rgba(255, 255, 255, 0.9); /* allow swirls to subtly show through */
-  color: #000;
+  background: transparent; /* show swirls fully through text */
+  color: #fff;
   padding: 2rem;
   border-radius: 8px;
   flex: 1;
@@ -84,7 +85,7 @@ footer {
   cursor: pointer;
 }
 .widget a {
-  color: #000;
+  color: #fff;
   text-decoration: none;
   font-weight: bold;
   font-size: 1.2rem;
@@ -96,11 +97,7 @@ footer {
 
 /* 8) Responsive adjustments */
 @media (max-width: 600px) {
-  .widgets {
-    flex-direction: column;
-  }
   .widget {
-    flex: none;
-    width: 100%;
+    flex: 1 0 100%;
   }
 }

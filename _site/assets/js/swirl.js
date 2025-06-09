@@ -15,7 +15,7 @@
 
   function animate() {
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = 'rgba(0,0,0,0.03)';
+    ctx.fillStyle = 'rgba(0,0,0,0.02)';
     ctx.fillRect(0, 0, w, h);
 
     ctx.fillStyle = '#fff';

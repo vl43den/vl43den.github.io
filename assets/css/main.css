@@ -9,6 +9,22 @@ html, body {
   font-family: 'Inter', sans-serif;
 }
 
+/* Modern link styling across site */
+a {
+  color: #fff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  transition: border-color 0.3s, color 0.3s, transform 0.3s;
+  padding-bottom: 1px;
+  position: relative;
+}
+
+a:hover {
+  color: #9cf;
+  border-bottom: 1px solid #9cf;
+  transform: translateY(-1px);
+}
+
 /* 2) Canvas: full-screen, at the very back */
 canvas#canvas {
   position: fixed;
@@ -40,10 +56,26 @@ header {
   background: rgba(0,0,0,0.3); /* more see-through */
   z-index: 2;
 }
+header nav {
+  display: flex;
+  gap: 1.5rem;
+}
 header nav a {
-  color: #9cf;
-  margin-right: 1rem;
+  color: #fff;
+  margin-right: 0;
   text-decoration: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.5rem 0;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+header nav a:hover {
+  color: #fff;
+  border-bottom: 2px solid #fff;
+  transform: translateY(0);
 }
 
 /* 5) Main page content: fully transparent so swirl & overlay show through */
@@ -53,8 +85,42 @@ header nav a {
   max-width: 800px;
   margin: 5rem auto 2rem;
   padding: 2rem;
-  background: transparent;
-  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(5px);
+  border-radius: 8px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Post content links styling */
+.post a {
+  color: #fff;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(156, 204, 255, 0.5);
+  padding: 0 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.post a::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  background-color: rgba(156, 204, 255, 0.15);
+  transition: height 0.3s ease;
+  z-index: -1;
+}
+
+.post a:hover::before {
+  height: 100%;
+}
+
+.post a:hover {
+  color: #fff;
+  border-bottom-color: #9cf;
 }
 
 /* 6) Footer: above everything except header */
@@ -75,7 +141,8 @@ footer {
   margin-top: 2rem;
 }
 .widget {
-  background: transparent; /* show swirls fully through text */
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
   color: #fff;
   padding: 2rem;
   border-radius: 8px;
@@ -83,12 +150,19 @@ footer {
   text-align: center;
   transition: transform 0.3s, box-shadow 0.3s;
   cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 .widget a {
   color: #fff;
   text-decoration: none;
   font-weight: bold;
   font-size: 1.2rem;
+  border-bottom: none;
+  transition: all 0.3s ease;
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
 }
 .widget:hover {
   transform: translateY(-5px) scale(1.05);

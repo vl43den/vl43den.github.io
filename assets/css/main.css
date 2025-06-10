@@ -43,8 +43,8 @@ canvas#canvas {
   top: 0; left: 0;
   width: 100vw;
   height: 100vh;
-  /* Subtle ice-blue overlay */
-  background: linear-gradient(135deg, rgba(200, 230, 255, 0.1) 0%, rgba(200, 230, 255, 0.05) 100%);
+  /* Pronounced ice-blue overlay */
+  background: linear-gradient(135deg, rgba(200, 230, 255, 0.30) 0%, rgba(200, 230, 255, 0.15) 100%);
   z-index: -1;
   pointer-events: none;
 }

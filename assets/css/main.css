@@ -38,34 +38,6 @@ canvas#canvas {
   opacity: 0.9; /* Slightly more visible */
 }
 
-/* Network Graph Canvas styling */
-#network-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 65vh;
-  z-index: 0;
-  opacity: 0.8;
-  pointer-events: auto;
-}
-
-/* Home page content positioning adjustment for network graph */
-.home .page-content {
-  margin-top: 60vh;
-}
-
-/* Responsive adjustments for network graph */
-@media (max-width: 768px) {
-  #network-canvas {
-    height: 45vh;
-  }
-  
-  .home .page-content {
-    margin-top: 40vh;
-  }
-}
-
 /* 3) Overlay: subtle tint above the swirl */
 .overlay {
   position: fixed;

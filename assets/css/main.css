@@ -4,9 +4,10 @@ html, body {
   padding: 0;
   height: 100%;
   /* Allow the animated canvas to show through */
-  background: transparent;
+  background-color: #000;
   color: #fff;
   font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
 }
 
 /* Modern link styling across site */
@@ -34,6 +35,7 @@ canvas#canvas {
   height: 100vh;
   z-index: -2;
   display: block;
+  opacity: 0.9; /* Slightly more visible */
 }
 
 /* 3) Overlay: subtle tint above the swirl */
@@ -42,7 +44,7 @@ canvas#canvas {
   top: 0; left: 0;
   width: 100vw;
   height: 100vh;
-  background: transparent;       /* let swirls show fully */
+  background: linear-gradient(135deg, rgba(10,10,30,0.6) 0%, rgba(5,5,20,0.5) 100%);
   z-index: -1;
   pointer-events: none;          /* let clicks through */
 }
@@ -85,11 +87,11 @@ header nav a:hover {
   max-width: 800px;
   margin: 5rem auto 2rem;
   padding: 2rem;
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(5px);
-  border-radius: 8px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Post content links styling */

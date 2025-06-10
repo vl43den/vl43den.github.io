@@ -101,7 +101,7 @@ header nav a:hover {
   border: 1px solid transparent;
   background: 
     linear-gradient(to bottom right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)) padding-box,
-    linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.1)) border-box;
+    linear-gradient(135deg, rgba(200, 255, 255, 0.6), rgba(200, 230, 255, 0.2)) border-box;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(8px);

@@ -12,9 +12,10 @@
 
   const noise = new SimplexNoise();
   const particles = Array.from({ length: 400 }, () => ({ x: Math.random() * w, y: Math.random() * h }));
-
   function animate() {
-    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+    ctx.clearRect(0, 0, w, h);
+    // Using a much lower alpha value to reduce flashing
+    ctx.fillStyle = 'rgba(0,0,0,0.01)';
     ctx.fillRect(0, 0, w, h);
 
     ctx.fillStyle = '#fff';

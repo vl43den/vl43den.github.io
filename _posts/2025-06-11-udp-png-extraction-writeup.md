@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "CTF Write-Up: forensics/packet-palette"
+title:  "TJCTF Challenge/forensics/packet-palette"
 date:   2025-06-11 12:00:00 +0000
 categories: [ctf]
 tags:      [pcap, wireshark, tshark, python, png]

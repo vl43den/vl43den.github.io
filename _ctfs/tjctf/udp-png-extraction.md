@@ -1,11 +1,11 @@
 ---
-layout: post
-title:  "TJCTF Challenge/forensics/packet-palette"
-date:   2025-06-11 12:00:00 +0000
-categories: [ctf]
-tags:      [pcap, wireshark, tshark, python, png]
+layout: challenge
+title: "TJCTF Challenge/forensics/packet-palette"
+date: 2025-06-11 12:00:00 +0000
+event: tjctf
+permalink: /writeups/tjctf/packet-palette/
+tags: [pcap, wireshark, tshark, python, png]
 ---
-
 ## Challenge Description
 
 We’re given a `.pcapng` containing UDP traffic on a non-standard port (1337). At first glance the payloads look like fixed-size blobs with repeating headers. Our goal: reconstruct an embedded PNG to recover the flag.

@@ -25,29 +25,6 @@ a:hover {
   transform: translateY(-1px);
 }
 
-/* 2) Canvas: full-screen, at the very back */
-canvas#canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -2;
-  display: block;
-  opacity: 0.9;
-}
-
-/* 3) Overlay: subtle tint above the swirl */
-.overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  /* Pronounced ice-blue overlay */
-  background: linear-gradient(135deg, rgba(200, 255, 255, 0.60) 0%, rgba(200, 230, 255, 0.2) 100%);
-  z-index: -1;
-  pointer-events: none;
-}
 
 /* Modern title - clean style */
 h1 {

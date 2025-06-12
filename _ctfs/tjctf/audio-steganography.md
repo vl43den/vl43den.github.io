@@ -1,11 +1,11 @@
 ---
-layout: post
-title:  "TJCTF Challenge /forensics/album-cover - Hidden Message in Audio"
-date:   2025-06-09 14:30:00 +00:00
-tags:   [forensics, audio, steganography, ctf, tjctf]
+layout: challenge
+title: "TJCTF Challenge /forensics/album-cover - Hidden Message in Audio"
+date: 2025-06-09 14:30:00 +00:00
+event: tjctf
+permalink: /writeups/tjctf/audio-steganography/
+tags: [forensics, audio, steganography, ctf, tjctf]
 ---
-
-# Hidden Message in Audio - TJCTF 2025
 
 ## Challenge Overview
 

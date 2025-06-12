@@ -1,0 +1,22 @@
+---
+layout: default
+title: Write-Ups
+---
+
+<h1>CTF Write-Ups</h1>
+{% assign by_event = site.ctfs | group_by: 'event' %}
+<ul>
+{% for event in by_event %}
+  <li>
+    <h2>{{ event.name | capitalize }}</h2>
+    <ul>
+      {% for item in event.items %}
+      <li><a href="{{ item.url | relative_url }}">{{ item.title }}</a> <small>&mdash; {{ item.date | date: "%B %-d, %Y" }}</small></li>
+      {% endfor %}
+    </ul>
+  </li>
+{% endfor %}
+{% if by_event == empty %}
+  <li>No write-ups yet.</li>
+{% endif %}
+</ul>

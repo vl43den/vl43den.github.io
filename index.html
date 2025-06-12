@@ -8,16 +8,21 @@ title: Home
 
   <section>
     <h2>Write-Ups</h2>
+    {% assign grouped = site.ctfs | group_by: 'event' %}
     <ul>
-      {% for post in site.posts %}
-        <li>
-          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-          <small>— {{ post.date | date: "%B %-d, %Y" }}</small>
-        </li>
-      {% endfor %}
-      {% if site.posts == empty %}
-        <li>No write-ups yet.</li>
-      {% endif %}
+    {% for grp in grouped %}
+      <li>
+        <strong>{{ grp.name | capitalize }}</strong>
+        <ul>
+        {% for item in grp.items %}
+          <li><a href="{{ item.url | relative_url }}">{{ item.title }}</a> <small>— {{ item.date | date: "%B %-d, %Y" }}</small></li>
+        {% endfor %}
+        </ul>
+      </li>
+    {% endfor %}
+    {% if grouped == empty %}
+      <li>No write-ups yet.</li>
+    {% endif %}
     </ul>
   </section>
 

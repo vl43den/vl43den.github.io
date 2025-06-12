@@ -10,7 +10,7 @@ collections:
     permalink: /projects/:path/
   ctfs:
     output: true
-    permalink: /:collection/:path/
+    permalink: /writeups/:path/
 
 markdown: kramdown
 theme: minima
@@ -38,4 +38,4 @@ defaults:
       type: "ctfs"
     values:
       layout: challenge
-      permalink: /:collection/:path/
+      permalink: /writeups/:path/

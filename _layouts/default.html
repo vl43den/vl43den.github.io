@@ -10,10 +10,7 @@
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
 </head>
 <body>
-  <!-- 1) Swirl canvas -->
-  <canvas id="canvas"></canvas>
-  <div class="overlay"></div>
-  <!-- 2) Header -->
+  <!-- Header -->
   {% include header.html %}
 
   <!-- 3) Your page’s content -->
@@ -23,9 +20,7 @@
 
   <!-- 4) Footer -->
   {% include footer.html %}
-  <!-- 5) Scripts -->
-  <script src="https://unpkg.com/simplex-noise@2.4.0/simplex-noise.js"></script>
-  <script src="{{ '/assets/js/swirl.js' | relative_url }}"></script>
+  <!-- Scripts -->
   <script src="{{ '/assets/js/widgets.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/hover-effect.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/typing-effect.js' | relative_url }}"></script>

@@ -11,14 +11,7 @@ title: Home
     {% assign grouped = site.ctfs | group_by: 'event' %}
     <ul>
     {% for grp in grouped %}
-      <li>
-        <strong>{{ grp.name | capitalize }}</strong>
-        <ul>
-        {% for item in grp.items %}
-          <li><a href="{{ item.url | relative_url }}">{{ item.title }}</a> <small>— {{ item.date | date: "%B %-d, %Y" }}</small></li>
-        {% endfor %}
-        </ul>
-      </li>
+      <li><a href="{{ '/writeups/' | append: grp.name | append: '/' | relative_url }}">{{ grp.name | capitalize }}</a> <small>({{ grp.items | size }})</small></li>
     {% endfor %}
     {% if grouped == empty %}
       <li>No write-ups yet.</li>

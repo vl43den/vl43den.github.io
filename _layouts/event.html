@@ -1,0 +1,13 @@
+---
+layout: default
+---
+<h1>{{ page.title }}</h1>
+<ul>
+{% assign event_posts = site.ctfs | where: 'event', page.event %}
+{% for item in event_posts %}
+  <li><a href="{{ item.url | relative_url }}">{{ item.title }}</a> <small>&mdash; {{ item.date | date: "%B %-d, %Y" }}</small></li>
+{% endfor %}
+{% if event_posts == empty %}
+  <li>No write-ups yet.</li>
+{% endif %}
+</ul>

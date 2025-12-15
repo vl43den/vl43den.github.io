@@ -3,133 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azure LogPoint Converter (Latest)</title>
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
+    <title>PySigma Web Converter</title>
     <style>
-        body { font-family: -apple-system, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background: #f9f9f9; }
-        textarea { width: 100%; font-family: monospace; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        button { background: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-        .status { padding: 15px; margin-bottom: 10px; border-radius: 4px; background: #e9ecef; border: 1px solid #ddd; font-family: monospace; font-size: 0.9em; }
-        .log-entry { margin: 3px 0; border-bottom: 1px solid #eee; padding-bottom: 2px; }
-        .error { color: #dc3545; font-weight: bold; background: #fff0f0; padding: 2px; }
-        .success { color: #28a745; font-weight: bold; }
-        pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; }
+        body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+        #log { background: #f4f4f4; padding: 15px; border-radius: 5px; border: 1px solid #ddd; height: 300px; overflow-y: scroll; font-family: monospace; white-space: pre-wrap; }
+        .success { color: green; }
+        .error { color: red; font-weight: bold; }
+        .info { color: #333; }
     </style>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
 </head>
 <body>
-    <h2>🚀 Custom Azure to LogPoint Converter</h2>
-    
-    <div id="status" class="status">
-        <div class="log-entry">⏳ Starting system...</div>
-    </div>
 
-    <textarea id="yamlInput" rows="12" placeholder="Paste your Sigma Rule (YAML) here..."></textarea>
-    <br><br>
-    <button onclick="runConversion()" id="convertBtn" disabled>Convert Rule</button>
-
-    <h3>Output:</h3>
-    <pre id="output">Waiting for system to load...</pre>
+    <h2>PySigma Environment</h2>
+    <div id="status">Initializing...</div>
+    <div id="log"></div>
 
     <script>
-        function log(msg, type='') {
-            const statusDiv = document.getElementById("status");
-            const entry = document.createElement("div");
-            entry.className = "log-entry " + type;
-            entry.innerHTML = msg;
-            statusDiv.appendChild(entry);
-            console.log(msg);
-        }
+        const logElement = document.getElementById("log");
+        const statusElement = document.getElementById("status");
 
-        let pyodide;
+        // Helper to print logs to the screen
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.textContent = message;
+            entry.className = type;
+            logElement.appendChild(entry);
+            logElement.scrollTop = logElement.scrollHeight; // Auto-scroll
+            console.log(message);
+        }
 
         async function main() {
             try {
-                log("Step 1: Loading Pyodide v0.26.2...");
-                pyodide = await loadPyodide();
-                log("✅ Pyodide loaded.", "success");
+                // Step 1: Load Pyodide
+                log("Step 1: Loading Pyodide...", 'info');
+                let pyodide = await loadPyodide();
+                log("✅ Pyodide loaded.", 'success');
 
-                log("Step 2: Loading Micropip...");
+                // Step 2: Load Micropip
+                log("Step 2: Loading Micropip...", 'info');
                 await pyodide.loadPackage("micropip");
-                log("✅ Micropip ready.", "success");
+                const micropip = pyodide.pyimport("micropip");
+                log("✅ Micropip ready.", 'success');
 
-                log("Step 3: Force-installing latest pySigma...");
+                // Step 3: Install pySigma (official)
+                log("Step 3: Force-installing latest pySigma...", 'info');
+                await micropip.install('pysigma');
+                log("✅ pySigma (latest) installed successfully.", 'success');
+
+                // Step 4: Install Custom Backend
+                // IMPORTANT: Filename must follow PEP 427 format (name-version-py3-none-any.whl)
+                const backendFilename = "custom_backend-0.1.0-py3-none-any.whl"; 
                 
-                // We use Python directly to handle the installation logic cleanly.
-                // This script manually installs PyYAML, then installs pySigma
-                // while ignoring the 'packaging' version conflict (deps=False).
-                await pyodide.runPythonAsync(`
-                    import micropip
-                    # 1. Install dependencies manually
-                    await micropip.install("PyYAML")
-                    
-                    # 2. Force install latest pySigma (ignoring dependencies check)
-                    await micropip.install("pysigma", deps=False)
+                log(`Step 4: Downloading custom backend: ./${backendFilename}...`, 'info');
+                
+                // We point micropip to the relative path of the renamed file
+                await micropip.install(`./${backendFilename}`);
+                
+                log("✅ Custom backend installed successfully.", 'success');
+
+                // Step 5: Verify installation
+                log("Step 5: Verifying imports...", 'info');
+                pyodide.runPython(`
+import sigma
+import custom_backend
+print(f"Sigma version: {sigma.__version__}")
+print("Custom backend imported successfully!")
                 `);
                 
-                log("✅ pySigma (latest) installed successfully.", "success");
-                
-                // --- CONFIGURATION ---
-                const wheelName = "./custom_backend.whl"; 
-                // ---------------------
-
-                log(`Step 4: Downloading custom backend: <b>${wheelName}</b>...`);
-                try {
-                    // We use micropip via Python to ensure consistency
-                    await pyodide.runPythonAsync(`
-                        await micropip.install("${wheelName}")
-                    `);
-                    log("✅ Custom Backend installed successfully!", "success");
-                } catch (wheelErr) {
-                    throw new Error(`Could not load '${wheelName}'. Ensure filename matches on GitHub.<br>${wheelErr}`);
-                }
-
-                log("🚀 <b>System Ready!</b>", "success");
-                document.getElementById("status").style.background = "#d4edda";
-                document.getElementById("convertBtn").disabled = false;
-                document.getElementById("output").innerText = "Ready for input.";
+                statusElement.textContent = "System Ready";
+                statusElement.style.color = "green";
 
             } catch (err) {
-                log(`❌ <b>CRITICAL ERROR:</b><br>${err}`, "error");
-                document.getElementById("status").style.background = "#f8d7da";
+                statusElement.textContent = "System Error";
+                statusElement.style.color = "red";
+                log(`❌ CRITICAL ERROR:\n${err}`, 'error');
             }
         }
+
         main();
-
-        async function runConversion() {
-            const yaml = document.getElementById("yamlInput").value;
-            // Escape backslashes and single quotes to prevent Python syntax errors
-            const escapedYaml = yaml.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-            
-            document.getElementById("output").innerText = "Processing...";
-
-            const pythonCode = `
-from sigma.collection import SigmaCollection
-from sigma.exceptions import SigmaError
-from sigma.backends.logpoint import LogPointBackend
-
-try:
-    # We use triple quotes to safely wrap multi-line input
-    rules = SigmaCollection.from_yaml(r'''${escapedYaml}''')
-    
-    backend = LogPointBackend()
-    queries = backend.convert(rules)
-    result = "\\n\\n".join(queries)
-except SigmaError as e:
-    result = f"Sigma Error: {str(e)}"
-except Exception as e:
-    import traceback
-    result = f"Python Error: {str(e)}\\n{traceback.format_exc()}"
-result
-            `;
-            
-            try {
-                const result = await pyodide.runPythonAsync(pythonCode);
-                document.getElementById("output").innerText = result;
-            } catch(e) {
-                document.getElementById("output").innerText = "Runtime Error: " + e;
-            }
-        }
     </script>
 </body>
 </html>

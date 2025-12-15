@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azure LogPoint Converter (Debug Mode)</title>
+    <title>Azure LogPoint Converter (Latest)</title>
     <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
     <style>
         body { font-family: -apple-system, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background: #f9f9f9; }
@@ -32,14 +32,13 @@
     <pre id="output">Waiting for system to load...</pre>
 
     <script>
-        // Helper to print messages to the screen
         function log(msg, type='') {
             const statusDiv = document.getElementById("status");
             const entry = document.createElement("div");
             entry.className = "log-entry " + type;
             entry.innerHTML = msg;
             statusDiv.appendChild(entry);
-            console.log(msg); // Also print to browser console
+            console.log(msg);
         }
 
         let pyodide;
@@ -50,30 +49,42 @@
                 pyodide = await loadPyodide();
                 log("✅ Pyodide loaded.", "success");
 
-                log("Step 2: Loading Micropip package manager...");
+                log("Step 2: Loading Micropip...");
                 await pyodide.loadPackage("micropip");
-                const micropip = pyodide.pyimport("micropip");
                 log("✅ Micropip ready.", "success");
 
-                log("Step 3: Installing pySigma dependencies...");
-                // This step failed before, but the new Pyodide version should fix it
-                await micropip.install("pysigma");
-                log("✅ pySigma installed.", "success");
+                log("Step 3: Force-installing latest pySigma...");
+                
+                // We use Python directly to handle the installation logic cleanly.
+                // This script manually installs PyYAML, then installs pySigma
+                // while ignoring the 'packaging' version conflict (deps=False).
+                await pyodide.runPythonAsync(`
+                    import micropip
+                    # 1. Install dependencies manually
+                    await micropip.install("PyYAML")
+                    
+                    # 2. Force install latest pySigma (ignoring dependencies check)
+                    await micropip.install("pysigma", deps=False)
+                `);
+                
+                log("✅ pySigma (latest) installed successfully.", "success");
                 
                 // --- CONFIGURATION ---
-                // Ensure this filename matches exactly what is in your GitHub folder!
                 const wheelName = "./custom_backend.whl"; 
                 // ---------------------
 
                 log(`Step 4: Downloading custom backend: <b>${wheelName}</b>...`);
                 try {
-                    await micropip.install(wheelName);
+                    // We use micropip via Python to ensure consistency
+                    await pyodide.runPythonAsync(`
+                        await micropip.install("${wheelName}")
+                    `);
                     log("✅ Custom Backend installed successfully!", "success");
                 } catch (wheelErr) {
-                    throw new Error(`Could not load '${wheelName}'. <br>Make sure the file in your GitHub folder is named exactly 'custom_backend.whl'.<br>Details: ${wheelErr}`);
+                    throw new Error(`Could not load '${wheelName}'. Ensure filename matches on GitHub.<br>${wheelErr}`);
                 }
 
-                log("🚀 <b>System Ready!</b> You can convert rules now.", "success");
+                log("🚀 <b>System Ready!</b>", "success");
                 document.getElementById("status").style.background = "#d4edda";
                 document.getElementById("convertBtn").disabled = false;
                 document.getElementById("output").innerText = "Ready for input.";

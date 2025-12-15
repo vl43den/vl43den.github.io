@@ -11,11 +11,12 @@
         .error { color: red; font-weight: bold; }
         .info { color: #333; }
     </style>
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.js"></script>
 </head>
 <body>
 
-    <h2>PySigma Environment</h2>
+    <h2>PySigma Environment (v0.29.0)</h2>
     <div id="status">Initializing...</div>
     <div id="log"></div>
 
@@ -23,20 +24,19 @@
         const logElement = document.getElementById("log");
         const statusElement = document.getElementById("status");
 
-        // Helper to print logs to the screen
         function log(message, type = 'info') {
             const entry = document.createElement('div');
             entry.textContent = message;
             entry.className = type;
             logElement.appendChild(entry);
-            logElement.scrollTop = logElement.scrollHeight; // Auto-scroll
+            logElement.scrollTop = logElement.scrollHeight;
             console.log(message);
         }
 
         async function main() {
             try {
-                // Step 1: Load Pyodide
-                log("Step 1: Loading Pyodide...", 'info');
+                // Step 1: Load Pyodide (Latest)
+                log("Step 1: Loading Pyodide v0.29.0...", 'info');
                 let pyodide = await loadPyodide();
                 log("✅ Pyodide loaded.", 'success');
 
@@ -46,28 +46,28 @@
                 const micropip = pyodide.pyimport("micropip");
                 log("✅ Micropip ready.", 'success');
 
-                // Step 3: Install pySigma (official)
-                log("Step 3: Force-installing latest pySigma...", 'info');
+                // Step 3: Install pySigma
+                // Now that we are on Pyodide 0.29.0, we can safely install 'latest' again
+                log("Step 3: Installing latest pySigma...", 'info');
                 await micropip.install('pysigma');
                 log("✅ pySigma (latest) installed successfully.", 'success');
 
                 // Step 4: Install Custom Backend
-                // IMPORTANT: Filename must follow PEP 427 format (name-version-py3-none-any.whl)
-                const backendFilename = "custom_backend-0.1.0-py3-none-any.whl"; 
+                // ✅ FIX 2: Ensure your wheel file is renamed to this EXACT format:
+                const backendFilename = "custom_backend-0.1.0-py3-none-any.whl";
                 
                 log(`Step 4: Downloading custom backend: ./${backendFilename}...`, 'info');
-                
-                // We point micropip to the relative path of the renamed file
                 await micropip.install(`./${backendFilename}`);
-                
                 log("✅ Custom backend installed successfully.", 'success');
 
-                // Step 5: Verify installation
+                // Step 5: Verify
                 log("Step 5: Verifying imports...", 'info');
                 pyodide.runPython(`
 import sigma
 import custom_backend
+import packaging
 print(f"Sigma version: {sigma.__version__}")
+print(f"Packaging version: {packaging.__version__}")
 print("Custom backend imported successfully!")
                 `);
                 

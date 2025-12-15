@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PySigma Client-Side (Like SigConverter, but Offline)</title>
+    <title>PySigma Serverless</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 20px; max-width: 900px; margin: 0 auto; background: #f9f9f9; }
         h2 { color: #2c3e50; }
@@ -13,8 +13,6 @@
         .error { color: #f92672; font-weight: bold; }
         .info { color: #66d9ef; }
         .warn { color: #e6db74; }
-        button { cursor: pointer; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; margin-top: 10px; }
-        button:disabled { background: #ccc; }
     </style>
     
     <script src="https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.js"></script>
@@ -48,31 +46,32 @@
             let pyodide = await loadPyodide();
             log("✅ Python Environment Ready.", 'success');
 
-            // 2. Load Micropip (The Package Installer)
+            // 2. Load Micropip
             await pyodide.loadPackage("micropip");
             const micropip = pyodide.pyimport("micropip");
             log("✅ Package Installer Ready.", 'success');
 
-            // 3. Dependency Override Strategy
-            // The latest pySigma wants PyYAML >= 6.0.3.
-            // Pyodide only has PyYAML 6.0.1 (compiled for Web).
-            // We install the Web-compatible versions first.
+            // 3. Pre-load Dependencies (The "Cheat" Step)
+            // We install the Web-compatible versions (PyYAML 6.0.1) first
             log("Pre-loading WebAssembly-compatible dependencies...", 'warn');
             await micropip.install(["pyyaml", "packaging"]);
             log("✅ Dependencies loaded (System Default).", 'success');
 
-            // 4. Force Install pySigma
-            // deps=False prevents micropip from checking versions and seeing the conflict.
+            // 4. Force Install pySigma (FIXED)
+            // We run this IN PYTHON to support the 'deps=False' argument correctly
             log("Force-installing pySigma (Latest)...", 'warn');
-            await micropip.install("pysigma", deps=False);
+            await pyodide.runPythonAsync(`
+                import micropip
+                # deps=False forces installation even if PyYAML version doesn't match
+                await micropip.install('pysigma', deps=False)
+            `);
             log("✅ pySigma installed (Version Constraints Bypassed).", 'success');
 
             // 5. Install Custom Backend
-            // Ensure this file exists in your folder!
             const backendFilename = "custom_backend-0.1.0-py3-none-any.whl";
             log(`Installing backend: ${backendFilename}...`, 'info');
             
-            // Check if file exists roughly via fetch before crashing python
+            // Safety check: Does file exist?
             const check = await fetch(backendFilename);
             if (!check.ok) throw new Error(`Could not find file: ${backendFilename}. Ensure it is in the same folder.`);
             
@@ -90,7 +89,6 @@ import packaging
 print("-" * 30)
 print(f"CORE: pySigma v{sigma.__version__}")
 print(f"DEPS: PyYAML v{yaml.__version__} (Web Optimized)")
-print(f"DEPS: Packaging v{packaging.__version__}")
 print("-" * 30)
 print("SUCCESS: The system is fully operational.")
             `);
@@ -102,7 +100,6 @@ print("SUCCESS: The system is fully operational.")
             statusElement.textContent = "❌ System Error";
             statusElement.style.color = "red";
             log(`CRITICAL FAILURE: ${err}`, 'error');
-            log(`TIP: Did you rename 'custom_backend.whl' to '${backendFilename}'?`, 'warn');
         }
     }
 

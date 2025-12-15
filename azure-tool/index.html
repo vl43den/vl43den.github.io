@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PySigma Serverless</title>
+    <title>PySigma Web Converter (LogPoint Edition)</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 20px; max-width: 900px; margin: 0 auto; background: #f9f9f9; }
         h2 { color: #2c3e50; }
@@ -20,7 +20,7 @@
 <body>
 
 <div class="container">
-    <h2>⚡ Serverless PySigma (Latest)</h2>
+    <h2>⚡ PySigma Web (LogPoint Backend)</h2>
     <p>Running the latest pySigma entirely in your browser using WebAssembly.</p>
     <div id="status">Initializing...</div>
     <div id="log"></div>
@@ -30,6 +30,7 @@
     const logElement = document.getElementById("log");
     const statusElement = document.getElementById("status");
 
+    // Helper to print colored logs
     function log(message, type = 'info') {
         const entry = document.createElement('div');
         entry.textContent = `> ${message}`;
@@ -41,56 +42,75 @@
 
     async function main() {
         try {
-            // 1. Initialize Pyodide
+            // ---------------------------------------------------------
+            // Step 1: Initialize Pyodide
+            // ---------------------------------------------------------
             log("Booting Python 3.12 (WASM)...", 'info');
             let pyodide = await loadPyodide();
             log("✅ Python Environment Ready.", 'success');
 
-            // 2. Load Micropip
+            // ---------------------------------------------------------
+            // Step 2: Load Micropip (The Package Installer)
+            // ---------------------------------------------------------
             await pyodide.loadPackage("micropip");
             const micropip = pyodide.pyimport("micropip");
             log("✅ Package Installer Ready.", 'success');
 
-            // 3. Pre-load Dependencies (The "Cheat" Step)
-            // We install the Web-compatible versions (PyYAML 6.0.1) first
+            // ---------------------------------------------------------
+            // Step 3: Dependency Override (The "Fix")
+            // ---------------------------------------------------------
+            // The latest pySigma wants PyYAML >= 6.0.3, which crashes Pyodide.
+            // We install the versions Pyodide actually HAS (e.g., 6.0.1) first.
             log("Pre-loading WebAssembly-compatible dependencies...", 'warn');
             await micropip.install(["pyyaml", "packaging"]);
             log("✅ Dependencies loaded (System Default).", 'success');
 
-            // 4. Force Install pySigma (FIXED)
-            // We run this IN PYTHON to support the 'deps=False' argument correctly
+            // ---------------------------------------------------------
+            // Step 4: Force Install pySigma (Latest)
+            // ---------------------------------------------------------
+            // We use 'deps=False' in Python to ignore the version conflict.
             log("Force-installing pySigma (Latest)...", 'warn');
             await pyodide.runPythonAsync(`
                 import micropip
-                # deps=False forces installation even if PyYAML version doesn't match
+                # deps=False tells micropip: "Don't check versions, just install it."
                 await micropip.install('pysigma', deps=False)
             `);
             log("✅ pySigma installed (Version Constraints Bypassed).", 'success');
 
-            // 5. Install Custom Backend
-            const backendFilename = "custom_backend-0.1.0-py3-none-any.whl";
-            log(`Installing backend: ${backendFilename}...`, 'info');
+            // ---------------------------------------------------------
+            // Step 5: Install Custom Backend
+            // ---------------------------------------------------------
+            // CRITICAL: This filename must match the name you set on GitHub.
+            const backendFilename = "pysigma_backend_logpoint-0.3.0-py3-none-any.whl";
             
-            // Safety check: Does file exist?
+            log(`Downloading backend: ${backendFilename}...`, 'info');
+            
+            // Safety check: verify file exists before passing to Python
             const check = await fetch(backendFilename);
-            if (!check.ok) throw new Error(`Could not find file: ${backendFilename}. Ensure it is in the same folder.`);
+            if (!check.ok) {
+                throw new Error(`404 Not Found: ${backendFilename}. \nDid you rename the file on GitHub?`);
+            }
             
             await micropip.install(`./${backendFilename}`);
-            log("✅ Custom backend installed.", 'success');
+            log("✅ LogPoint Backend installed.", 'success');
 
-            // 6. Final System Check
+            // ---------------------------------------------------------
+            // Step 6: Final Verification
+            // ---------------------------------------------------------
             log("Running system diagnostics...", 'info');
-            pyodide.runPython(`
-import sigma
-import custom_backend
-import yaml
-import packaging
-
-print("-" * 30)
-print(f"CORE: pySigma v{sigma.__version__}")
-print(f"DEPS: PyYAML v{yaml.__version__} (Web Optimized)")
-print("-" * 30)
-print("SUCCESS: The system is fully operational.")
+            
+            // We verify by importing everything.
+            // Note: The python import name usually uses underscores.
+            await pyodide.runPythonAsync(`
+                import sigma
+                import pysigma_backend_logpoint 
+                import yaml
+                
+                print("-" * 30)
+                print(f"CORE: pySigma v{sigma.__version__}")
+                print(f"BACKEND: LogPoint Plugin Loaded Successfully")
+                print(f"DEPS: PyYAML v{yaml.__version__} (Web Optimized)")
+                print("-" * 30)
             `);
 
             statusElement.textContent = "✅ System Ready";
@@ -100,6 +120,10 @@ print("SUCCESS: The system is fully operational.")
             statusElement.textContent = "❌ System Error";
             statusElement.style.color = "red";
             log(`CRITICAL FAILURE: ${err}`, 'error');
+            
+            if (err.message.includes("404")) {
+                 log("TIP: Go to GitHub and rename 'custom_backend.whl' to 'pysigma_backend_logpoint-0.3.0-py3-none-any.whl'", 'warn');
+            }
         }
     }
 

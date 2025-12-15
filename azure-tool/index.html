@@ -3,65 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azure LogPoint Converter</title>
+    <title>Azure LogPoint Converter (Debug)</title>
     <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background: #f9f9f9; }
-        textarea { width: 100%; font-family: "Consolas", "Monaco", monospace; border: 1px solid #ccc; border-radius: 4px; padding: 10px; }
-        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-        .status { padding: 10px; margin-bottom: 10px; border-radius: 4px; background: #e9ecef; }
-        pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; }
+        body { font-family: -apple-system, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background: #f9f9f9; }
+        textarea { width: 100%; font-family: monospace; padding: 10px; border: 1px solid #ccc; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 4px; }
+        button:disabled { background: #ccc; }
+        .status { padding: 15px; margin-bottom: 10px; border-radius: 4px; background: #e9ecef; border: 1px solid #ddd;}
+        .log-entry { margin: 5px 0; border-bottom: 1px solid #eee; padding-bottom: 2px; }
+        .error { color: #dc3545; font-weight: bold; }
+        .success { color: #28a745; font-weight: bold; }
     </style>
 </head>
 <body>
     <h2>🚀 Custom Azure to LogPoint Converter</h2>
     
-    <div id="status" class="status">⏳ Initializing Python environment...</div>
+    <div id="status" class="status">
+        <div class="log-entry">⏳ Starting system...</div>
+    </div>
 
     <textarea id="yamlInput" rows="12" placeholder="Paste your Sigma Rule (YAML) here..."></textarea>
     <br><br>
     <button onclick="runConversion()" id="convertBtn" disabled>Convert Rule</button>
 
-    <h3>LogPoint Query Output:</h3>
-    <pre id="output"> Waiting for input...</pre>
+    <h3>Output:</h3>
+    <pre id="output" style="background:#333; color:#fff; padding:15px; border-radius:4px;">Waiting...</pre>
 
     <script>
+        // Helper to print messages to the screen
+        function log(msg, type='') {
+            const statusDiv = document.getElementById("status");
+            const entry = document.createElement("div");
+            entry.className = "log-entry " + type;
+            entry.innerHTML = msg;
+            statusDiv.appendChild(entry);
+            console.log(msg);
+        }
+
         let pyodide;
 
         async function main() {
             try {
+                log("Step 1: Loading Pyodide from CDN...");
                 pyodide = await loadPyodide();
-                
-                // --- FIX STARTS HERE ---
-                // We must load the package manager first!
+                log("✅ Pyodide loaded.", "success");
+
+                log("Step 2: Loading Micropip package manager...");
                 await pyodide.loadPackage("micropip");
                 const micropip = pyodide.pyimport("micropip");
-                // --- FIX ENDS HERE ---
+                log("✅ Micropip ready.", "success");
 
-                // 1. Install generic pySigma dependencies
+                log("Step 3: Installing pySigma dependencies...");
                 await micropip.install("pysigma");
+                log("✅ pySigma installed.", "success");
                 
-                // 2. Install YOUR custom wheel
-                // This looks for the file relative to where index.html is located
-                await micropip.install("./custom_backend.whl");
+                // IMPORTANT: This file name must match EXACTLY what is in your GitHub repo
+                const wheelName = "./custom_backend.whl";
+                log(`Step 4: Downloading custom backend: <b>${wheelName}</b>...`);
+                
+                try {
+                    await micropip.install(wheelName);
+                    log("✅ Custom Backend installed successfully!", "success");
+                } catch (wheelErr) {
+                    throw new Error(`Could not load ${wheelName}. Ensure the file is in the azure-tool folder. Details: ${wheelErr}`);
+                }
 
-                document.getElementById("status").innerHTML = "✅ <b>Ready!</b> System loaded.";
+                log("🚀 <b>System Ready!</b> You can convert rules now.", "success");
                 document.getElementById("status").style.background = "#d4edda";
                 document.getElementById("convertBtn").disabled = false;
+
             } catch (err) {
-                document.getElementById("status").innerHTML = "❌ <b>Error loading:</b> " + err;
+                log(`❌ <b>CRITICAL ERROR:</b><br>${err}`, "error");
                 document.getElementById("status").style.background = "#f8d7da";
-                console.error(err);
             }
         }
         main();
 
         async function runConversion() {
             const yaml = document.getElementById("yamlInput").value;
-            // Escape backslashes and single quotes to prevent Python syntax errors
             const escapedYaml = yaml.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-            
             document.getElementById("output").innerText = "Processing...";
 
             const pythonCode = `
@@ -70,17 +91,12 @@ from sigma.exceptions import SigmaError
 from sigma.backends.logpoint import LogPointBackend
 
 try:
-    # We use triple quotes to safely wrap multi-line input
     rules = SigmaCollection.from_yaml(r'''${escapedYaml}''')
-    
     backend = LogPointBackend()
     queries = backend.convert(rules)
     result = "\\n\\n".join(queries)
-except SigmaError as e:
-    result = f"Sigma Error: {str(e)}"
 except Exception as e:
-    import traceback
-    result = f"Python Error: {str(e)}\\n{traceback.format_exc()}"
+    result = f"Error: {str(e)}"
 result
             `;
             
@@ -88,4 +104,9 @@ result
                 const result = await pyodide.runPythonAsync(pythonCode);
                 document.getElementById("output").innerText = result;
             } catch(e) {
-                document.getElementById("
+                document.getElementById("output").innerText = "Runtime Error: " + e;
+            }
+        }
+    </script>
+</body>
+</html>

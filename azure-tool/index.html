@@ -3,85 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PySigma Web Converter</title>
+    <title>PySigma Client-Side (Like SigConverter, but Offline)</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; line-height: 1.6; }
-        #log { background: #f4f4f4; padding: 15px; border-radius: 5px; border: 1px solid #ddd; height: 300px; overflow-y: scroll; font-family: monospace; white-space: pre-wrap; }
-        .success { color: green; }
-        .error { color: red; font-weight: bold; }
-        .info { color: #333; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 20px; max-width: 900px; margin: 0 auto; background: #f9f9f9; }
+        h2 { color: #2c3e50; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        #log { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; height: 350px; overflow-y: auto; font-family: "Fira Code", monospace; font-size: 14px; margin-top: 15px; }
+        .success { color: #a6e22e; } 
+        .error { color: #f92672; font-weight: bold; }
+        .info { color: #66d9ef; }
+        .warn { color: #e6db74; }
+        button { cursor: pointer; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; margin-top: 10px; }
+        button:disabled { background: #ccc; }
     </style>
     
     <script src="https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.js"></script>
 </head>
 <body>
 
-    <h2>PySigma Environment (v0.29.0)</h2>
+<div class="container">
+    <h2>⚡ Serverless PySigma (Latest)</h2>
+    <p>Running the latest pySigma entirely in your browser using WebAssembly.</p>
     <div id="status">Initializing...</div>
     <div id="log"></div>
+</div>
 
-    <script>
-        const logElement = document.getElementById("log");
-        const statusElement = document.getElementById("status");
+<script>
+    const logElement = document.getElementById("log");
+    const statusElement = document.getElementById("status");
 
-        function log(message, type = 'info') {
-            const entry = document.createElement('div');
-            entry.textContent = message;
-            entry.className = type;
-            logElement.appendChild(entry);
-            logElement.scrollTop = logElement.scrollHeight;
-            console.log(message);
-        }
+    function log(message, type = 'info') {
+        const entry = document.createElement('div');
+        entry.textContent = `> ${message}`;
+        entry.className = type;
+        logElement.appendChild(entry);
+        logElement.scrollTop = logElement.scrollHeight;
+        console.log(message);
+    }
 
-        async function main() {
-            try {
-                // Step 1: Load Pyodide (Latest)
-                log("Step 1: Loading Pyodide v0.29.0...", 'info');
-                let pyodide = await loadPyodide();
-                log("✅ Pyodide loaded.", 'success');
+    async function main() {
+        try {
+            // 1. Initialize Pyodide
+            log("Booting Python 3.12 (WASM)...", 'info');
+            let pyodide = await loadPyodide();
+            log("✅ Python Environment Ready.", 'success');
 
-                // Step 2: Load Micropip
-                log("Step 2: Loading Micropip...", 'info');
-                await pyodide.loadPackage("micropip");
-                const micropip = pyodide.pyimport("micropip");
-                log("✅ Micropip ready.", 'success');
+            // 2. Load Micropip (The Package Installer)
+            await pyodide.loadPackage("micropip");
+            const micropip = pyodide.pyimport("micropip");
+            log("✅ Package Installer Ready.", 'success');
 
-                // Step 3: Install pySigma
-                // Now that we are on Pyodide 0.29.0, we can safely install 'latest' again
-                log("Step 3: Installing latest pySigma...", 'info');
-                await micropip.install('pysigma');
-                log("✅ pySigma (latest) installed successfully.", 'success');
+            // 3. Dependency Override Strategy
+            // The latest pySigma wants PyYAML >= 6.0.3.
+            // Pyodide only has PyYAML 6.0.1 (compiled for Web).
+            // We install the Web-compatible versions first.
+            log("Pre-loading WebAssembly-compatible dependencies...", 'warn');
+            await micropip.install(["pyyaml", "packaging"]);
+            log("✅ Dependencies loaded (System Default).", 'success');
 
-                // Step 4: Install Custom Backend
-                // ✅ FIX 2: Ensure your wheel file is renamed to this EXACT format:
-                const backendFilename = "custom_backend-0.1.0-py3-none-any.whl";
-                
-                log(`Step 4: Downloading custom backend: ./${backendFilename}...`, 'info');
-                await micropip.install(`./${backendFilename}`);
-                log("✅ Custom backend installed successfully.", 'success');
+            // 4. Force Install pySigma
+            // deps=False prevents micropip from checking versions and seeing the conflict.
+            log("Force-installing pySigma (Latest)...", 'warn');
+            await micropip.install("pysigma", deps=False);
+            log("✅ pySigma installed (Version Constraints Bypassed).", 'success');
 
-                // Step 5: Verify
-                log("Step 5: Verifying imports...", 'info');
-                pyodide.runPython(`
+            // 5. Install Custom Backend
+            // Ensure this file exists in your folder!
+            const backendFilename = "custom_backend-0.1.0-py3-none-any.whl";
+            log(`Installing backend: ${backendFilename}...`, 'info');
+            
+            // Check if file exists roughly via fetch before crashing python
+            const check = await fetch(backendFilename);
+            if (!check.ok) throw new Error(`Could not find file: ${backendFilename}. Ensure it is in the same folder.`);
+            
+            await micropip.install(`./${backendFilename}`);
+            log("✅ Custom backend installed.", 'success');
+
+            // 6. Final System Check
+            log("Running system diagnostics...", 'info');
+            pyodide.runPython(`
 import sigma
 import custom_backend
+import yaml
 import packaging
-print(f"Sigma version: {sigma.__version__}")
-print(f"Packaging version: {packaging.__version__}")
-print("Custom backend imported successfully!")
-                `);
-                
-                statusElement.textContent = "System Ready";
-                statusElement.style.color = "green";
 
-            } catch (err) {
-                statusElement.textContent = "System Error";
-                statusElement.style.color = "red";
-                log(`❌ CRITICAL ERROR:\n${err}`, 'error');
-            }
+print("-" * 30)
+print(f"CORE: pySigma v{sigma.__version__}")
+print(f"DEPS: PyYAML v{yaml.__version__} (Web Optimized)")
+print(f"DEPS: Packaging v{packaging.__version__}")
+print("-" * 30)
+print("SUCCESS: The system is fully operational.")
+            `);
+
+            statusElement.textContent = "✅ System Ready";
+            statusElement.style.color = "green";
+
+        } catch (err) {
+            statusElement.textContent = "❌ System Error";
+            statusElement.style.color = "red";
+            log(`CRITICAL FAILURE: ${err}`, 'error');
+            log(`TIP: Did you rename 'custom_backend.whl' to '${backendFilename}'?`, 'warn');
         }
+    }
 
-        main();
-    </script>
+    main();
+</script>
 </body>
 </html>

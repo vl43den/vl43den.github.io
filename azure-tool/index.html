@@ -32,8 +32,12 @@
         async function main() {
             try {
                 pyodide = await loadPyodide();
+                
+                // --- FIX STARTS HERE ---
+                // We must load the package manager first!
+                await pyodide.loadPackage("micropip");
                 const micropip = pyodide.pyimport("micropip");
-                await micropip.install("micropip");
+                // --- FIX ENDS HERE ---
 
                 // 1. Install generic pySigma dependencies
                 await micropip.install("pysigma");
@@ -48,33 +52,35 @@
             } catch (err) {
                 document.getElementById("status").innerHTML = "❌ <b>Error loading:</b> " + err;
                 document.getElementById("status").style.background = "#f8d7da";
+                console.error(err);
             }
         }
         main();
 
         async function runConversion() {
             const yaml = document.getElementById("yamlInput").value;
+            // Escape backslashes and single quotes to prevent Python syntax errors
+            const escapedYaml = yaml.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+            
             document.getElementById("output").innerText = "Processing...";
 
             const pythonCode = `
 from sigma.collection import SigmaCollection
 from sigma.exceptions import SigmaError
 from sigma.backends.logpoint import LogPointBackend
-# from sigma.pipelines.logpoint import logpoint_azure_pipeline  # Uncomment if you added a pipeline file
 
 try:
-    rules = SigmaCollection.from_yaml(r'''${yaml}''')
+    # We use triple quotes to safely wrap multi-line input
+    rules = SigmaCollection.from_yaml(r'''${escapedYaml}''')
     
-    # Initialize your backend
     backend = LogPointBackend()
-    # backend = LogPointBackend(processing_pipeline=logpoint_azure_pipeline()) # Swap if using pipeline
-    
     queries = backend.convert(rules)
     result = "\\n\\n".join(queries)
 except SigmaError as e:
     result = f"Sigma Error: {str(e)}"
 except Exception as e:
-    result = f"Python Error: {str(e)}"
+    import traceback
+    result = f"Python Error: {str(e)}\\n{traceback.format_exc()}"
 result
             `;
             
@@ -82,9 +88,4 @@ result
                 const result = await pyodide.runPythonAsync(pythonCode);
                 document.getElementById("output").innerText = result;
             } catch(e) {
-                document.getElementById("output").innerText = "Runtime Error: " + e;
-            }
-        }
-    </script>
-</body>
-</html>
+                document.getElementById("

@@ -6,27 +6,31 @@
     <title>PySigma for LogPoint (Serverless)</title>
     <script src="https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.js"></script>
     <style>
-        /* Modern, Clean UI */
+        /* Modern, Clean UI optimized for Mobile */
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 0; margin: 0; background: #f4f7f6; color: #333; }
-        .app-container { max-width: 1000px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        h2 { margin-top: 0; color: #2c3e50; display: flex; align-items: center; gap: 10px; }
+        .app-container { max-width: 1000px; margin: 20px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        h2 { margin-top: 0; color: #2c3e50; display: flex; align-items: center; gap: 10px; font-size: 1.2rem; }
         .status-dot { height: 12px; width: 12px; background-color: #ccc; border-radius: 50%; display: inline-block; }
         .status-dot.ready { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
         .status-dot.error { background-color: #e74c3c; }
 
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 20px; }
+        /* Stack columns on mobile */
+        @media (min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
+        
         .editor-section { display: flex; flex-direction: column; }
         label { font-weight: 600; margin-bottom: 8px; color: #555; }
         
         textarea { 
-            width: 100%; height: 350px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; 
+            width: 100%; height: 300px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; 
             font-family: "Fira Code", monospace; font-size: 13px; line-height: 1.5; resize: vertical; 
-            background: #fafafa; outline: none; transition: border 0.2s;
+            background: #fafafa; outline: none; transition: border 0.2s; box-sizing: border-box;
         }
         textarea:focus { border-color: #007bff; background: white; }
         
-        .controls { margin-top: 20px; text-align: right; }
+        .controls { margin-top: 20px; text-align: center; }
         button { 
+            width: 100%; max-width: 300px;
             padding: 12px 25px; background: #007bff; color: white; border: none; border-radius: 6px; 
             font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; 
             opacity: 0.6; pointer-events: none; /* Disabled until loaded */
@@ -42,6 +46,7 @@
         .log-success { color: #a6e22e; }
         .log-error { color: #f92672; }
         .log-info { color: #66d9ef; }
+        .log-warn { color: #e6db74; }
     </style>
 </head>
 <body>
@@ -112,16 +117,16 @@ level: high
             await pyodide.loadPackage("micropip");
             const micropip = pyodide.pyimport("micropip");
             
-            // 3. Install Dependencies (The "Kitchen Sink" List)
+            // 3. Install Core Dependencies (The "Kitchen Sink" List)
             log("Installing Core Dependencies...", "warn");
             const deps = ["pyyaml", "packaging", "pyparsing", "typing-extensions", "requests", "jinja2", "pydantic"];
             await micropip.install(deps);
             
-            // 4. Install pySigma (Force)
+            // 4. Install pySigma (Force install to bypass checks)
             log("Installing pySigma...", "warn");
             await pyodide.runPythonAsync(`import micropip; await micropip.install('pysigma', deps=False)`);
 
-            // 5. Install LogPoint Backend
+            // 5. Install LogPoint Plugin
             const wheelName = "pysigma_backend_logpoint-0.3.0-py3-none-any.whl";
             log(`Loading Plugin: ${wheelName}...`);
             
@@ -130,13 +135,11 @@ level: high
             
             await micropip.install(`./${wheelName}`);
             
-            // 6. Final Quick Check (Simplified to prevent "Stuck" state)
+            // 6. Final Verification (Simplified to avoid crashing)
             log("Verifying...", "info");
             await pyodide.runPythonAsync(`
-                import sigma
-                import yaml
-                # We simply try to import the module. If this fails, the catch block handles it.
                 from sigma.backends.logpoint import Logpoint
+                print("Backend loaded successfully")
             `);
 
             // SUCCESS STATE
@@ -156,45 +159,62 @@ level: high
     async function runConversion() {
         if (!pyodide) return;
         
-        const inputRule = document.getElementById("sigmaInput").value;
+        const inputRule = document.getElementById("sigmaInput").value.trim();
         const outputBox = document.getElementById("queryOutput");
         
+        if (!inputRule) {
+            log("Error: Input is empty", "error");
+            return;
+        }
+
         outputBox.value = "Converting...";
         log("Converting...", "info");
 
         try {
-            // Pass the input string securely to Python
+            // 1. Pass the user's YAML to Python variable 'user_rule'
             pyodide.globals.set("user_rule", inputRule);
 
-            // Run the Conversion Script
-            // Note: We use the class name 'Logpoint' which we verified exists.
-            const result = await pyodide.runPythonAsync(`
+            // 2. Run the conversion in Python
+            // FIX: We save the result to 'global_output' to ensure we can retrieve it safely.
+            await pyodide.runPythonAsync(`
                 from sigma.collection import SigmaCollection
                 from sigma.backends.logpoint import Logpoint
+                import sys
+                
+                global_output = ""
                 
                 try:
-                    # 1. Parse YAML
+                    # Parse YAML
                     collection = SigmaCollection.from_yaml(user_rule)
                     
-                    # 2. Initialize Backend
+                    # Initialize Backend
                     backend = Logpoint()
                     
-                    # 3. Convert
+                    # Convert
                     queries = backend.convert(collection)
                     
-                    # 4. Return Result (Join if multiple queries)
-                    "\\n".join(queries)
+                    # Save result to global variable
+                    global_output = "\\n".join(queries)
                     
                 except Exception as e:
-                    f"ERROR: {str(e)}"
+                    # Capture exact Python error
+                    global_output = f"PYTHON ERROR: {str(e)}"
             `);
 
+            // 3. Fetch the result securely from Python
+            const result = pyodide.globals.get("global_output");
+            
             outputBox.value = result;
-            log("Conversion Complete", "success");
+            
+            if (result && result.includes("PYTHON ERROR")) {
+                log("Conversion Failed (Check syntax)", "error");
+            } else {
+                log("Conversion Complete", "success");
+            }
 
         } catch (err) {
-            outputBox.value = `Python Error:\n${err}`;
-            log("Conversion Failed", "error");
+            outputBox.value = `System Error:\n${err}`;
+            log("Critical Failure", "error");
         }
     }
 

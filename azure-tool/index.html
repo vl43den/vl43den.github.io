@@ -80,7 +80,7 @@
             // ---------------------------------------------------------
             // Step 5: Install Custom Backend
             // ---------------------------------------------------------
-            // CRITICAL: This filename must match the name you set on GitHub.
+            // Matches the filename in your GitHub screenshot
             const backendFilename = "pysigma_backend_logpoint-0.3.0-py3-none-any.whl";
             
             log(`Downloading backend: ${backendFilename}...`, 'info');
@@ -88,27 +88,33 @@
             // Safety check: verify file exists before passing to Python
             const check = await fetch(backendFilename);
             if (!check.ok) {
-                throw new Error(`404 Not Found: ${backendFilename}. \nDid you rename the file on GitHub?`);
+                throw new Error(`404 Not Found: ${backendFilename}. \nCheck your GitHub filename.`);
             }
             
             await micropip.install(`./${backendFilename}`);
             log("✅ LogPoint Backend installed.", 'success');
 
             // ---------------------------------------------------------
-            // Step 6: Final Verification
+            // Step 6: Final Verification (CORRECTED)
             // ---------------------------------------------------------
             log("Running system diagnostics...", 'info');
             
-            // We verify by importing everything.
-            // Note: The python import name usually uses underscores.
+            // We verify by importing the correct 'sigma.backends' namespace
             await pyodide.runPythonAsync(`
                 import sigma
-                import pysigma_backend_logpoint 
                 import yaml
                 
+                # FIX: Import the module path, not the filename
+                try:
+                    from sigma.backends.logpoint import LogPointBackend
+                    status_msg = "INSTALLED & LOADED"
+                except ImportError as e:
+                    status_msg = f"IMPORT ERROR: {str(e)}"
+                    raise e
+
                 print("-" * 30)
                 print(f"CORE: pySigma v{sigma.__version__}")
-                print(f"BACKEND: LogPoint Plugin Loaded Successfully")
+                print(f"BACKEND: {status_msg}")
                 print(f"DEPS: PyYAML v{yaml.__version__} (Web Optimized)")
                 print("-" * 30)
             `);
@@ -120,10 +126,6 @@
             statusElement.textContent = "❌ System Error";
             statusElement.style.color = "red";
             log(`CRITICAL FAILURE: ${err}`, 'error');
-            
-            if (err.message.includes("404")) {
-                 log("TIP: Go to GitHub and rename 'custom_backend.whl' to 'pysigma_backend_logpoint-0.3.0-py3-none-any.whl'", 'warn');
-            }
         }
     }
 

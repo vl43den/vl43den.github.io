@@ -60,7 +60,7 @@
             // ---------------------------------------------------------
             log("Pre-loading ALL dependencies...", 'warn');
             
-            // We include ALL known dependencies to prevent ModuleNotFoundErrors
+            // The "Kitchen Sink" list of dependencies to prevent errors
             const dependencies = [
                 "pyyaml",             
                 "packaging",          
@@ -100,7 +100,7 @@
             log("✅ LogPoint Backend installed.", 'success');
 
             // ---------------------------------------------------------
-            // Step 6: Final Verification (SMART IMPORT)
+            // Step 6: Final Verification (FIXED VERSION CHECK)
             // ---------------------------------------------------------
             log("Running system diagnostics...", 'info');
             
@@ -108,29 +108,32 @@
                 import sigma
                 import yaml
                 import jinja2
+                from importlib.metadata import version
                 
-                # We try both potential class names to be safe
+                # FIX: Use importlib to get the version safely
+                try:
+                    sigma_ver = version("pysigma")
+                except:
+                    sigma_ver = "Unknown (Installed via deps=False)"
+
+                # Import Logic: Try 'Logpoint' first, then 'LogpointBackend'
                 backend_class = None
                 try:
-                    # Try Name 1: Logpoint (Seen in your error logs)
                     from sigma.backends.logpoint import Logpoint
                     backend_class = Logpoint
                     name_found = "Logpoint"
                 except ImportError:
                     try:
-                        # Try Name 2: LogpointBackend (Standard naming convention)
                         from sigma.backends.logpoint import LogpointBackend
                         backend_class = LogpointBackend
                         name_found = "LogpointBackend"
                     except ImportError:
-                        # Debug: If both fail, print what IS inside the module
-                        import sigma.backends.logpoint
-                        print("DEBUG: Available names in module:", dir(sigma.backends.logpoint))
                         raise Exception("Could not find 'Logpoint' class in module.")
 
                 print("-" * 30)
-                print(f"CORE: pySigma v{sigma.__version__}")
+                print(f"CORE: pySigma v{sigma_ver}")
                 print(f"BACKEND: Found class '{name_found}' -> SUCCESS")
+                print(f"DEPS: Jinja2 v{jinja2.__version__}")
                 print("-" * 30)
             `);
 

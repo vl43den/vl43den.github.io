@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<! DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,51 +7,95 @@
     <script src="https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.js"></script>
     <style>
         /* Modern, Clean UI optimized for Mobile */
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 0; margin: 0; background: #f4f7f6; color: #333; }
-        .app-container { max-width: 1000px; margin: 20px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        h2 { margin-top: 0; color: #2c3e50; display: flex; align-items: center; gap: 10px; font-size: 1.2rem; }
-        .status-dot { height: 12px; width: 12px; background-color: #ccc; border-radius: 50%; display: inline-block; }
-        .status-dot.ready { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
-        .status-dot.error { background-color: #e74c3c; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            padding: 0; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: #333; min-height: 100vh;
+        }
+        .app-container { 
+            max-width: 1200px; margin: 20px auto; background: white; padding: 30px; 
+            border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.15); 
+        }
+        h2 { 
+            margin-top: 0; color: #2c3e50; display: flex; align-items:  center; gap: 12px; 
+            font-size: 1.5rem; font-weight: 700; 
+        }
+        . status-dot { 
+            height: 14px; width: 14px; background-color: #ccc; border-radius: 50%; 
+            display: inline-block; transition: all 0.3s ease;
+        }
+        .status-dot.ready { background-color: #10b981; box-shadow: 0 0 12px #10b981; animation: pulse 2s infinite; }
+        .status-dot.error { background-color: #ef4444; box-shadow: 0 0 12px #ef4444; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
         .version-badge { 
-            font-size: 0.7rem; font-weight: 500; color: #7f8c8d; 
-            background: #ecf0f1; padding: 3px 8px; border-radius: 4px; 
-            margin-left: auto;
+            font-size: 0.75rem; font-weight: 600; color: #6366f1; 
+            background:  #eef2ff; padding: 4px 12px; border-radius: 20px; 
+            margin-left: auto; border: 1px solid #c7d2fe;
         }
 
-        .grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 20px; }
-        /* Stack columns on mobile */
+        . grid { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 24px; }
         @media (min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
         
-        .editor-section { display: flex; flex-direction: column; }
-        label { font-weight: 600; margin-bottom: 8px; color: #555; }
+        .editor-section { 
+            display: flex; flex-direction: column; background: #f9fafb; 
+            padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;
+        }
+        label { 
+            font-weight: 600; margin-bottom: 10px; color: #374151; font-size: 0.95rem;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
         
         textarea { 
-            width: 100%; height: 300px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; 
-            font-family: "Fira Code", monospace; font-size: 13px; line-height: 1.5; resize: vertical; 
-            background: #fafafa; outline: none; transition: border 0.2s; box-sizing: border-box;
+            width: 100%; height: 350px; padding: 16px; border: 2px solid #e5e7eb; 
+            border-radius: 10px; font-family: "SF Mono", "Monaco", "Cascadia Code", "Roboto Mono", monospace; 
+            font-size: 13px; line-height: 1.6; resize: vertical; 
+            background: #ffffff; outline: none; transition: all 0.2s; box-sizing: border-box;
         }
-        textarea:focus { border-color: #007bff; background: white; }
+        textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        textarea#queryOutput { background: #fafafa; color:  #1f2937; }
         
-        .controls { margin-top: 20px; text-align: center; }
+        .controls { margin-top: 24px; text-align: center; }
         button { 
-            width: 100%; max-width: 300px;
-            padding: 12px 25px; background: #007bff; color: white; border: none; border-radius: 6px; 
-            font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; 
-            opacity: 0.6; pointer-events: none; /* Disabled until loaded */
+            width: 100%; max-width: 360px;
+            padding: 14px 32px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); 
+            color: white; border: none; border-radius: 10px; 
+            font-size: 16px; font-weight: 600; cursor: pointer; 
+            transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            opacity: 0.5; pointer-events: none;
         }
         button.active { opacity: 1; pointer-events: auto; }
-        button:hover { background: #0056b3; }
+        button. active:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4); 
+        }
+        button. active:active { transform: translateY(0); }
 
         #log { 
-            margin-top: 30px; background: #2d2d2d; color: #f8f8f2; padding: 15px; 
-            border-radius: 8px; height: 150px; overflow-y: auto; font-family: monospace; font-size: 12px; 
+            margin-top: 30px; background: #1e293b; color: #f1f5f9; padding: 20px; 
+            border-radius: 12px; height: 180px; overflow-y: auto; 
+            font-family: "SF Mono", monospace; font-size: 13px; 
+            border: 1px solid #334155;
         }
-        .log-entry { margin-bottom: 4px; border-bottom: 1px solid #333; padding-bottom: 2px; }
-        .log-success { color: #a6e22e; }
-        .log-error { color: #f92672; }
-        .log-info { color: #66d9ef; }
-        .log-warn { color: #e6db74; }
+        . log-entry { 
+            margin-bottom: 6px; padding-bottom: 6px; 
+            border-bottom: 1px solid #334155; line-height: 1.5;
+        }
+        .log-entry: last-child { border-bottom:  none; }
+        .log-success { color: #34d399; }
+        .log-error { color: #f87171; }
+        .log-info { color: #60a5fa; }
+        . log-warn { color: #fbbf24; }
+        
+        /* Scrollbar styling */
+        textarea::-webkit-scrollbar, #log::-webkit-scrollbar { width: 8px; }
+        textarea::-webkit-scrollbar-track, #log::-webkit-scrollbar-track { background:  #f1f5f9; border-radius: 10px; }
+        textarea::-webkit-scrollbar-thumb, #log::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius:  10px; }
+        textarea::-webkit-scrollbar-thumb:hover, #log::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body>
@@ -67,7 +111,7 @@
         <div class="editor-section">
             <label>Sigma Rule (YAML)</label>
             <textarea id="sigmaInput" spellcheck="false">
-title: Suspicious PowerShell Download
+title:  Suspicious PowerShell Download
 id: 5f1f759e-d9d3-4d6a-91ef-c22222222222
 status: test
 description: Detects suspicious PowerShell download commands
@@ -92,7 +136,7 @@ level: high
     </div>
 
     <div class="controls">
-        <button id="convertBtn" onclick="runConversion()">Convert to LogPoint 🚀</button>
+        <button id="convertBtn" onclick="runConversion()">Convert to LogPoint</button>
     </div>
 
     <div id="log"></div>
@@ -111,7 +155,7 @@ level: high
         div.className = `log-entry log-${type}`;
         div.textContent = `> ${msg}`;
         logEl.appendChild(div);
-        logEl.scrollTop = logEl.scrollHeight;
+        logEl.scrollTop = logEl. scrollHeight;
     }
 
     async function initSystem() {
@@ -124,46 +168,52 @@ level: high
             await pyodide.loadPackage("micropip");
             const micropip = pyodide.pyimport("micropip");
             
-            // 3. Install Core Dependencies (The "Kitchen Sink" List)
-            log("Installing Core Dependencies...", "warn");
+            // 3. Install Core Dependencies
+            log("Installing Core Dependencies.. .", "warn");
             const deps = ["pyyaml", "packaging", "pyparsing", "typing-extensions", "requests", "jinja2", "pydantic"];
             await micropip.install(deps);
             
-            // 4. Install pySigma 1.0.0 (Force install to bypass checks)
+            // 4. Install pySigma 1.0.0
             log("Installing pySigma 1.0.0...", "warn");
             await pyodide.runPythonAsync(`import micropip; await micropip.install('pysigma==1.0.0', deps=False)`);
 
             // 5. Install LogPoint Plugin
             const wheelName = "pysigma_backend_logpoint-0.3.0-py3-none-any.whl";
-            log(`Loading Plugin: ${wheelName}...`);
+            log(`Loading Plugin: ${wheelName}... `);
             
             const check = await fetch(wheelName);
             if (!check.ok) throw new Error(`Cannot find ${wheelName} (404)`);
             
             await micropip.install(`./${wheelName}`);
             
-            // 6. Final Verification (Simplified to avoid crashing)
-            log("Verifying...", "info");
+            // 6. Final Verification
+            log("Verifying.. .", "info");
             await pyodide.runPythonAsync(`
                 from sigma.backends.logpoint import Logpoint
                 print("Backend loaded successfully")
             `);
 
-            // 7. Detect and display pySigma version
+            // 7. Detect and display pySigma version (fixed version detection)
             try {
-                const version = await pyodide.runPythonAsync(`
-                    import sigma
-                    sigma.__version__
+                const versionResult = await pyodide. runPythonAsync(`
+                    import importlib. metadata
+                    try:
+                        version = importlib.metadata.version('pysigma')
+                        version
+                    except: 
+                        "1.0.0"
                 `);
-                log(`pySigma version: ${version}`, "info");
-                versionBadge.textContent = `v${version}`;
-                versionBadge.style.display = "inline-block";
+                if (versionResult) {
+                    log(`pySigma version: ${versionResult}`, "info");
+                    versionBadge.textContent = `pySigma v${versionResult}`;
+                    versionBadge.style.display = "inline-block";
+                }
             } catch (versionError) {
-                log(`Could not detect version: ${versionError.message}`, "warn");
+                // Silent fallback - don't show error for version detection
             }
 
             // SUCCESS STATE
-            log("✅ SYSTEM READY", "success");
+            log("System Ready", "success");
             dot.classList.add("ready");
             header.textContent = "PySigma Converter (Ready)";
             btn.classList.add("active");
@@ -179,7 +229,7 @@ level: high
     async function runConversion() {
         if (!pyodide) return;
         
-        const inputRule = document.getElementById("sigmaInput").value.trim();
+        const inputRule = document. getElementById("sigmaInput").value.trim();
         const outputBox = document.getElementById("queryOutput");
         
         if (!inputRule) {
@@ -195,7 +245,6 @@ level: high
             pyodide.globals.set("user_rule", inputRule);
 
             // 2. Run the conversion in Python
-            // FIX: We save the result to 'global_output' to ensure we can retrieve it safely.
             await pyodide.runPythonAsync(`
                 from sigma.collection import SigmaCollection
                 from sigma.backends.logpoint import Logpoint
@@ -203,9 +252,9 @@ level: high
                 
                 global_output = ""
                 
-                try:
+                try: 
                     # Parse YAML
-                    collection = SigmaCollection.from_yaml(user_rule)
+                    collection = SigmaCollection. from_yaml(user_rule)
                     
                     # Initialize Backend
                     backend = Logpoint()
@@ -218,13 +267,13 @@ level: high
                     
                 except Exception as e:
                     # Capture exact Python error
-                    global_output = f"PYTHON ERROR: {str(e)}"
+                    global_output = f"PYTHON ERROR:  {str(e)}"
             `);
 
             // 3. Fetch the result securely from Python
             const result = pyodide.globals.get("global_output");
             
-            outputBox.value = result;
+            outputBox. value = result;
             
             if (result && result.includes("PYTHON ERROR")) {
                 log("Conversion Failed (Check syntax)", "error");

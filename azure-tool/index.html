@@ -30,7 +30,6 @@
     const logElement = document.getElementById("log");
     const statusElement = document.getElementById("status");
 
-    // Helper to print colored logs
     function log(message, type = 'info') {
         const entry = document.createElement('div');
         entry.textContent = `> ${message}`;
@@ -50,20 +49,29 @@
             log("✅ Python Environment Ready.", 'success');
 
             // ---------------------------------------------------------
-            // Step 2: Load Micropip (The Package Installer)
+            // Step 2: Load Micropip
             // ---------------------------------------------------------
             await pyodide.loadPackage("micropip");
             const micropip = pyodide.pyimport("micropip");
             log("✅ Package Installer Ready.", 'success');
 
             // ---------------------------------------------------------
-            // Step 3: Dependency Override (The "Fix")
+            // Step 3: Manual Dependency Injection (The "Kitchen Sink" Fix)
             // ---------------------------------------------------------
-            // Because we use deps=False later, we must manually install ALL dependencies.
-            // Added 'pyparsing' to this list to fix your specific error.
-            log("Pre-loading WebAssembly-compatible dependencies...", 'warn');
-            await micropip.install(["pyyaml", "packaging", "pyparsing"]); 
-            log("✅ Dependencies loaded (PyYAML, Packaging, PyParsing).", 'success');
+            // Since we turned off auto-install, we must list EVERY library pySigma needs.
+            // Added: typing-extensions, requests, colorama (just in case)
+            log("Pre-loading ALL known dependencies...", 'warn');
+            
+            const dependencies = [
+                "pyyaml", 
+                "packaging", 
+                "pyparsing", 
+                "typing-extensions", 
+                "requests"
+            ];
+            
+            await micropip.install(dependencies); 
+            log("✅ Dependencies loaded: " + dependencies.join(", "), 'success');
 
             // ---------------------------------------------------------
             // Step 4: Force Install pySigma (Latest)
@@ -71,10 +79,11 @@
             log("Force-installing pySigma (Latest)...", 'warn');
             await pyodide.runPythonAsync(`
                 import micropip
-                # deps=False tells micropip: "Don't check versions, just install it."
+                # deps=False stops it from complaining about versions, 
+                # but forces us to do Step 3 manually.
                 await micropip.install('pysigma', deps=False)
             `);
-            log("✅ pySigma installed (Version Constraints Bypassed).", 'success');
+            log("✅ pySigma installed.", 'success');
 
             // ---------------------------------------------------------
             // Step 5: Install Custom Backend
@@ -83,10 +92,10 @@
             
             log(`Downloading backend: ${backendFilename}...`, 'info');
             
-            // Safety check: verify file exists before passing to Python
+            // Safety check
             const check = await fetch(backendFilename);
             if (!check.ok) {
-                throw new Error(`404 Not Found: ${backendFilename}. \nCheck your GitHub filename.`);
+                throw new Error(`404 Not Found: ${backendFilename}.`);
             }
             
             await micropip.install(`./${backendFilename}`);
@@ -100,10 +109,9 @@
             await pyodide.runPythonAsync(`
                 import sigma
                 import yaml
-                # We also import pyparsing to prove it's there
                 import pyparsing
+                import typing_extensions
                 
-                # Import the module path, not the filename
                 try:
                     from sigma.backends.logpoint import LogPointBackend
                     status_msg = "INSTALLED & LOADED"
@@ -114,8 +122,7 @@
                 print("-" * 30)
                 print(f"CORE: pySigma v{sigma.__version__}")
                 print(f"BACKEND: {status_msg}")
-                print(f"DEPS: PyYAML v{yaml.__version__}")
-                print(f"DEPS: PyParsing v{pyparsing.__version__}")
+                print(f"DEPS: Typing Extensions v{typing_extensions.__version__}")
                 print("-" * 30)
             `);
 

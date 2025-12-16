@@ -1,295 +1,398 @@
-<! DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PySigma for LogPoint (Serverless)</title>
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.js"></script>
+    <title>Azure SIEM Rule Converter</title>
     <style>
-        /* Modern, Clean UI optimized for Mobile */
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            padding: 0; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: #333; min-height: 100vh;
-        }
-        .app-container { 
-            max-width: 1200px; margin: 20px auto; background: white; padding: 30px; 
-            border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.15); 
-        }
-        h2 { 
-            margin-top: 0; color: #2c3e50; display: flex; align-items:  center; gap: 12px; 
-            font-size: 1.5rem; font-weight: 700; 
-        }
-        . status-dot { 
-            height: 14px; width: 14px; background-color: #ccc; border-radius: 50%; 
-            display: inline-block; transition: all 0.3s ease;
-        }
-        .status-dot.ready { background-color: #10b981; box-shadow: 0 0 12px #10b981; animation: pulse 2s infinite; }
-        .status-dot.error { background-color: #ef4444; box-shadow: 0 0 12px #ef4444; }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-        
-        .version-badge { 
-            font-size: 0.75rem; font-weight: 600; color: #6366f1; 
-            background:  #eef2ff; padding: 4px 12px; border-radius: 20px; 
-            margin-left: auto; border: 1px solid #c7d2fe;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        . grid { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 24px; }
-        @media (min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
-        
-        .editor-section { 
-            display: flex; flex-direction: column; background: #f9fafb; 
-            padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #ffffff;
+            color: #333;
+            line-height: 1.6;
         }
-        label { 
-            font-weight: 600; margin-bottom: 10px; color: #374151; font-size: 0.95rem;
-            text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        
-        textarea { 
-            width: 100%; height: 350px; padding: 16px; border: 2px solid #e5e7eb; 
-            border-radius: 10px; font-family: "SF Mono", "Monaco", "Cascadia Code", "Roboto Mono", monospace; 
-            font-size: 13px; line-height: 1.6; resize: vertical; 
-            background: #ffffff; outline: none; transition: all 0.2s; box-sizing: border-box;
-        }
-        textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
-        textarea#queryOutput { background: #fafafa; color:  #1f2937; }
-        
-        .controls { margin-top: 24px; text-align: center; }
-        button { 
-            width: 100%; max-width: 360px;
-            padding: 14px 32px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); 
-            color: white; border: none; border-radius: 10px; 
-            font-size: 16px; font-weight: 600; cursor: pointer; 
-            transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-            opacity: 0.5; pointer-events: none;
-        }
-        button.active { opacity: 1; pointer-events: auto; }
-        button. active:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4); 
-        }
-        button. active:active { transform: translateY(0); }
 
-        #log { 
-            margin-top: 30px; background: #1e293b; color: #f1f5f9; padding: 20px; 
-            border-radius: 12px; height: 180px; overflow-y: auto; 
-            font-family: "SF Mono", monospace; font-size: 13px; 
-            border: 1px solid #334155;
+        .container {
+            display: flex;
+            height: 100vh;
+            max-width: 1800px;
+            margin: 0 auto;
         }
-        . log-entry { 
-            margin-bottom: 6px; padding-bottom: 6px; 
-            border-bottom: 1px solid #334155; line-height: 1.5;
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+            overflow-y: auto;
         }
-        .log-entry: last-child { border-bottom:  none; }
-        .log-success { color: #34d399; }
-        .log-error { color: #f87171; }
-        .log-info { color: #60a5fa; }
-        . log-warn { color: #fbbf24; }
-        
-        /* Scrollbar styling */
-        textarea::-webkit-scrollbar, #log::-webkit-scrollbar { width: 8px; }
-        textarea::-webkit-scrollbar-track, #log::-webkit-scrollbar-track { background:  #f1f5f9; border-radius: 10px; }
-        textarea::-webkit-scrollbar-thumb, #log::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius:  10px; }
-        textarea::-webkit-scrollbar-thumb:hover, #log::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .sidebar {
+            width: 400px;
+            background: #f8f9fa;
+            border-left: 1px solid #e1e4e8;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            color: #0078d4;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        input[type="file"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #ffffff;
+        }
+
+        input[type="file"]:hover,
+        select:hover,
+        textarea:hover {
+            border-color: #0078d4;
+        }
+
+        input[type="file"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #0078d4;
+            box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+        }
+
+        textarea {
+            min-height: 150px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            resize: vertical;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #0078d4;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #006abc;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            color: #333;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+            border-color: #0078d4;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .output-section {
+            margin-top: 40px;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .output-header h2 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: #333;
+        }
+
+        .output-content {
+            background: #f8f9fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            padding: 20px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .sidebar h2 {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .log-entry {
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            border-left: 3px solid;
+        }
+
+        .log-info {
+            background: #e3f2fd;
+            border-left-color: #2196f3;
+            color: #1565c0;
+        }
+
+        .log-success {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+            color: #2e7d32;
+        }
+
+        .log-warning {
+            background: #fff3e0;
+            border-left-color: #ff9800;
+            color: #e65100;
+        }
+
+        .log-error {
+            background: #ffebee;
+            border-left-color: #f44336;
+            color: #c62828;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .info-box {
+            background: #f0f7ff;
+            border: 1px solid #bdd7f0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            color: #004085;
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid #e1e4e8;
+                max-height: 400px;
+            }
+        }
     </style>
 </head>
 <body>
+    <div class="container">
+        <div class="main-content">
+            <h1>Azure SIEM Rule Converter</h1>
+            <p class="subtitle">Convert Sigma rules to Azure Sentinel KQL queries</p>
 
-<div class="app-container">
-    <h2>
-        <span id="statusDot" class="status-dot"></span> 
-        <span id="headerText">Initializing System...</span>
-        <span id="versionBadge" class="version-badge" style="display: none;"></span>
-    </h2>
+            <div class="info-box">
+                This tool converts Sigma detection rules into KQL (Kusto Query Language) format for use in Azure Sentinel. Upload a Sigma YAML file or paste the content directly.
+            </div>
 
-    <div class="grid">
-        <div class="editor-section">
-            <label>Sigma Rule (YAML)</label>
-            <textarea id="sigmaInput" spellcheck="false">
-title:  Suspicious PowerShell Download
-id: 5f1f759e-d9d3-4d6a-91ef-c22222222222
-status: test
-description: Detects suspicious PowerShell download commands
-author: Your Name
-date: 2024/01/01
-logsource:
-    category: process_creation
-    product: windows
-detection:
-    selection:
-        Image|endswith: '\powershell.exe'
-        CommandLine|contains: 'Net.WebClient'
-    condition: selection
-level: high
-            </textarea>
+            <div class="form-group">
+                <label for="fileInput">Upload Sigma Rule File (.yml or .yaml)</label>
+                <input type="file" id="fileInput" accept=".yml,.yaml">
+            </div>
+
+            <div class="form-group">
+                <label for="sigmaContent">Or Paste Sigma Rule Content</label>
+                <textarea id="sigmaContent" placeholder="Paste your Sigma rule YAML content here..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="targetProduct">Target Product</label>
+                <select id="targetProduct">
+                    <option value="azure">Azure Sentinel</option>
+                    <option value="splunk">Splunk</option>
+                    <option value="elasticsearch">Elasticsearch</option>
+                </select>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" onclick="convertRule()">Convert Rule</button>
+                <button class="btn-secondary" onclick="clearAll()">Clear All</button>
+            </div>
+
+            <div class="output-section">
+                <div class="output-header">
+                    <h2>Converted Query</h2>
+                    <button class="btn-secondary" onclick="copyOutput()" id="copyBtn" style="flex: 0 0 auto; display: none;">Copy to Clipboard</button>
+                </div>
+                <div class="output-content" id="output">Your converted KQL query will appear here...</div>
+            </div>
         </div>
 
-        <div class="editor-section">
-            <label>LogPoint Query Output</label>
-            <textarea id="queryOutput" readonly placeholder="Waiting for system to load..."></textarea>
+        <div class="sidebar">
+            <h2>Activity Log</h2>
+            <div id="logPanel"></div>
         </div>
     </div>
 
-    <div class="controls">
-        <button id="convertBtn" onclick="runConversion()">Convert to LogPoint</button>
-    </div>
-
-    <div id="log"></div>
-</div>
-
-<script>
-    let pyodide = null;
-    const logEl = document.getElementById("log");
-    const btn = document.getElementById("convertBtn");
-    const dot = document.getElementById("statusDot");
-    const header = document.getElementById("headerText");
-    const versionBadge = document.getElementById("versionBadge");
-
-    function log(msg, type='info') {
-        const div = document.createElement("div");
-        div.className = `log-entry log-${type}`;
-        div.textContent = `> ${msg}`;
-        logEl.appendChild(div);
-        logEl.scrollTop = logEl. scrollHeight;
-    }
-
-    async function initSystem() {
-        try {
-            // 1. Load Pyodide
-            log("Booting Python Engine (WASM)...");
-            pyodide = await loadPyodide();
+    <script>
+        function addLog(message, type = 'info') {
+            const logPanel = document.getElementById('logPanel');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logPanel.insertBefore(logEntry, logPanel.firstChild);
             
-            // 2. Load Micropip
-            await pyodide.loadPackage("micropip");
-            const micropip = pyodide.pyimport("micropip");
-            
-            // 3. Install Core Dependencies
-            log("Installing Core Dependencies.. .", "warn");
-            const deps = ["pyyaml", "packaging", "pyparsing", "typing-extensions", "requests", "jinja2", "pydantic"];
-            await micropip.install(deps);
-            
-            // 4. Install pySigma 1.0.0
-            log("Installing pySigma 1.0.0...", "warn");
-            await pyodide.runPythonAsync(`import micropip; await micropip.install('pysigma==1.0.0', deps=False)`);
+            // Keep only last 20 logs
+            while (logPanel.children.length > 20) {
+                logPanel.removeChild(logPanel.lastChild);
+            }
+        }
 
-            // 5. Install LogPoint Plugin
-            const wheelName = "pysigma_backend_logpoint-0.3.0-py3-none-any.whl";
-            log(`Loading Plugin: ${wheelName}... `);
-            
-            const check = await fetch(wheelName);
-            if (!check.ok) throw new Error(`Cannot find ${wheelName} (404)`);
-            
-            await micropip.install(`./${wheelName}`);
-            
-            // 6. Final Verification
-            log("Verifying.. .", "info");
-            await pyodide.runPythonAsync(`
-                from sigma.backends.logpoint import Logpoint
-                print("Backend loaded successfully")
-            `);
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('sigmaContent').value = e.target.result;
+                    addLog(`File loaded: ${file.name}`, 'success');
+                };
+                reader.onerror = function() {
+                    addLog('Error reading file', 'error');
+                };
+                reader.readAsText(file);
+            }
+        });
 
-            // 7. Detect and display pySigma version (fixed version detection)
+        async function convertRule() {
+            const content = document.getElementById('sigmaContent').value;
+            const target = document.getElementById('targetProduct').value;
+            const output = document.getElementById('output');
+            const copyBtn = document.getElementById('copyBtn');
+
+            if (!content.trim()) {
+                addLog('Please provide Sigma rule content', 'warning');
+                return;
+            }
+
+            addLog('Starting conversion...', 'info');
+            output.textContent = 'Converting...';
+            copyBtn.style.display = 'none';
+
             try {
-                const versionResult = await pyodide. runPythonAsync(`
-                    import importlib. metadata
-                    try:
-                        version = importlib.metadata.version('pysigma')
-                        version
-                    except: 
-                        "1.0.0"
-                `);
-                if (versionResult) {
-                    log(`pySigma version: ${versionResult}`, "info");
-                    versionBadge.textContent = `pySigma v${versionResult}`;
-                    versionBadge.style.display = "inline-block";
+                const response = await fetch('/api/convert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sigma_rule: content,
+                        target_product: target
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.kql_query) {
+                    output.textContent = data.kql_query;
+                    copyBtn.style.display = 'block';
+                    addLog('Conversion successful', 'success');
+                } else {
+                    const errorMsg = data.error || 'Conversion failed';
+                    output.textContent = `Error: ${errorMsg}`;
+                    addLog(errorMsg, 'error');
                 }
-            } catch (versionError) {
-                // Silent fallback - don't show error for version detection
+            } catch (error) {
+                const errorMsg = `Network error: ${error.message}`;
+                output.textContent = errorMsg;
+                addLog(errorMsg, 'error');
             }
-
-            // SUCCESS STATE
-            log("System Ready", "success");
-            dot.classList.add("ready");
-            header.textContent = "PySigma Converter (Ready)";
-            btn.classList.add("active");
-            document.getElementById("queryOutput").placeholder = "System ready. Click Convert.";
-
-        } catch (e) {
-            log(`CRITICAL ERROR: ${e.message}`, "error");
-            dot.classList.add("error");
-            header.textContent = "System Failed";
-        }
-    }
-
-    async function runConversion() {
-        if (!pyodide) return;
-        
-        const inputRule = document. getElementById("sigmaInput").value.trim();
-        const outputBox = document.getElementById("queryOutput");
-        
-        if (!inputRule) {
-            log("Error: Input is empty", "error");
-            return;
         }
 
-        outputBox.value = "Converting...";
-        log("Converting...", "info");
-
-        try {
-            // 1. Pass the user's YAML to Python variable 'user_rule'
-            pyodide.globals.set("user_rule", inputRule);
-
-            // 2. Run the conversion in Python
-            await pyodide.runPythonAsync(`
-                from sigma.collection import SigmaCollection
-                from sigma.backends.logpoint import Logpoint
-                import sys
-                
-                global_output = ""
-                
-                try: 
-                    # Parse YAML
-                    collection = SigmaCollection. from_yaml(user_rule)
-                    
-                    # Initialize Backend
-                    backend = Logpoint()
-                    
-                    # Convert
-                    queries = backend.convert(collection)
-                    
-                    # Save result to global variable
-                    global_output = "\\n".join(queries)
-                    
-                except Exception as e:
-                    # Capture exact Python error
-                    global_output = f"PYTHON ERROR:  {str(e)}"
-            `);
-
-            // 3. Fetch the result securely from Python
-            const result = pyodide.globals.get("global_output");
-            
-            outputBox. value = result;
-            
-            if (result && result.includes("PYTHON ERROR")) {
-                log("Conversion Failed (Check syntax)", "error");
-            } else {
-                log("Conversion Complete", "success");
-            }
-
-        } catch (err) {
-            outputBox.value = `System Error:\n${err}`;
-            log("Critical Failure", "error");
+        function copyOutput() {
+            const output = document.getElementById('output');
+            navigator.clipboard.writeText(output.textContent).then(() => {
+                addLog('Copied to clipboard', 'success');
+                const copyBtn = document.getElementById('copyBtn');
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                addLog('Failed to copy to clipboard', 'error');
+            });
         }
-    }
 
-    // Start Boot Sequence
-    initSystem();
-</script>
+        function clearAll() {
+            document.getElementById('fileInput').value = '';
+            document.getElementById('sigmaContent').value = '';
+            document.getElementById('output').textContent = 'Your converted KQL query will appear here...';
+            document.getElementById('copyBtn').style.display = 'none';
+            addLog('Form cleared', 'info');
+        }
 
+        // Initial log
+        addLog('Application ready', 'success');
+    </script>
 </body>
 </html>

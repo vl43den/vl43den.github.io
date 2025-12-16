@@ -59,16 +59,15 @@
             // ---------------------------------------------------------
             // Step 3: Dependency Override (The "Fix")
             // ---------------------------------------------------------
-            // The latest pySigma wants PyYAML >= 6.0.3, which crashes Pyodide.
-            // We install the versions Pyodide actually HAS (e.g., 6.0.1) first.
+            // Because we use deps=False later, we must manually install ALL dependencies.
+            // Added 'pyparsing' to this list to fix your specific error.
             log("Pre-loading WebAssembly-compatible dependencies...", 'warn');
-            await micropip.install(["pyyaml", "packaging"]);
-            log("✅ Dependencies loaded (System Default).", 'success');
+            await micropip.install(["pyyaml", "packaging", "pyparsing"]); 
+            log("✅ Dependencies loaded (PyYAML, Packaging, PyParsing).", 'success');
 
             // ---------------------------------------------------------
             // Step 4: Force Install pySigma (Latest)
             // ---------------------------------------------------------
-            // We use 'deps=False' in Python to ignore the version conflict.
             log("Force-installing pySigma (Latest)...", 'warn');
             await pyodide.runPythonAsync(`
                 import micropip
@@ -80,7 +79,6 @@
             // ---------------------------------------------------------
             // Step 5: Install Custom Backend
             // ---------------------------------------------------------
-            // Matches the filename in your GitHub screenshot
             const backendFilename = "pysigma_backend_logpoint-0.3.0-py3-none-any.whl";
             
             log(`Downloading backend: ${backendFilename}...`, 'info');
@@ -95,16 +93,17 @@
             log("✅ LogPoint Backend installed.", 'success');
 
             // ---------------------------------------------------------
-            // Step 6: Final Verification (CORRECTED)
+            // Step 6: Final Verification
             // ---------------------------------------------------------
             log("Running system diagnostics...", 'info');
             
-            // We verify by importing the correct 'sigma.backends' namespace
             await pyodide.runPythonAsync(`
                 import sigma
                 import yaml
+                # We also import pyparsing to prove it's there
+                import pyparsing
                 
-                # FIX: Import the module path, not the filename
+                # Import the module path, not the filename
                 try:
                     from sigma.backends.logpoint import LogPointBackend
                     status_msg = "INSTALLED & LOADED"
@@ -115,7 +114,8 @@
                 print("-" * 30)
                 print(f"CORE: pySigma v{sigma.__version__}")
                 print(f"BACKEND: {status_msg}")
-                print(f"DEPS: PyYAML v{yaml.__version__} (Web Optimized)")
+                print(f"DEPS: PyYAML v{yaml.__version__}")
+                print(f"DEPS: PyParsing v{pyparsing.__version__}")
                 print("-" * 30)
             `);
 

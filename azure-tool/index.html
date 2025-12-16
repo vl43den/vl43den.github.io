@@ -56,18 +56,20 @@
             log("✅ Package Installer Ready.", 'success');
 
             // ---------------------------------------------------------
-            // Step 3: Manual Dependency Injection (The "Kitchen Sink" Fix)
+            // Step 3: COMPLETE Dependency Injection
             // ---------------------------------------------------------
-            // Since we turned off auto-install, we must list EVERY library pySigma needs.
-            // Added: typing-extensions, requests, colorama (just in case)
-            log("Pre-loading ALL known dependencies...", 'warn');
+            // We are manually installing EVERYTHING pySigma might need
+            // to avoid any more "ModuleNotFoundError" crashes.
+            log("Pre-loading ALL dependencies (Jinja2, Pydantic, etc.)...", 'warn');
             
             const dependencies = [
-                "pyyaml", 
-                "packaging", 
-                "pyparsing", 
-                "typing-extensions", 
-                "requests"
+                "pyyaml",             // Config parsing
+                "packaging",          // Version checking
+                "pyparsing",          // Query parsing
+                "typing-extensions",  // Type hints
+                "requests",           // HTTP requests
+                "jinja2",             // Templating (Missing in previous error)
+                "pydantic"            // Data validation (Commonly needed)
             ];
             
             await micropip.install(dependencies); 
@@ -79,8 +81,7 @@
             log("Force-installing pySigma (Latest)...", 'warn');
             await pyodide.runPythonAsync(`
                 import micropip
-                # deps=False stops it from complaining about versions, 
-                # but forces us to do Step 3 manually.
+                # deps=False stops version conflicts but requires Step 3
                 await micropip.install('pysigma', deps=False)
             `);
             log("✅ pySigma installed.", 'success');
@@ -109,8 +110,7 @@
             await pyodide.runPythonAsync(`
                 import sigma
                 import yaml
-                import pyparsing
-                import typing_extensions
+                import jinja2
                 
                 try:
                     from sigma.backends.logpoint import LogPointBackend
@@ -122,7 +122,7 @@
                 print("-" * 30)
                 print(f"CORE: pySigma v{sigma.__version__}")
                 print(f"BACKEND: {status_msg}")
-                print(f"DEPS: Typing Extensions v{typing_extensions.__version__}")
+                print(f"DEPS: Jinja2 v{jinja2.__version__}")
                 print("-" * 30)
             `);
 

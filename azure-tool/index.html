@@ -129,9 +129,9 @@ level: high
             const deps = ["pyyaml", "packaging", "pyparsing", "typing-extensions", "requests", "jinja2", "pydantic"];
             await micropip.install(deps);
             
-            // 4. Install pySigma (Force install to bypass checks)
-            log("Installing pySigma...", "warn");
-            await pyodide.runPythonAsync(`import micropip; await micropip.install('pysigma', deps=False)`);
+            // 4. Install pySigma 1.0.0 (Force install to bypass checks)
+            log("Installing pySigma 1.0.0...", "warn");
+            await pyodide.runPythonAsync(`import micropip; await micropip.install('pysigma==1.0.0', deps=False)`);
 
             // 5. Install LogPoint Plugin
             const wheelName = "pysigma_backend_logpoint-0.3.0-py3-none-any.whl";

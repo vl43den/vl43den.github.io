@@ -13,6 +13,11 @@
         .status-dot { height: 12px; width: 12px; background-color: #ccc; border-radius: 50%; display: inline-block; }
         .status-dot.ready { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
         .status-dot.error { background-color: #e74c3c; }
+        .version-badge { 
+            font-size: 0.7rem; font-weight: 500; color: #7f8c8d; 
+            background: #ecf0f1; padding: 3px 8px; border-radius: 4px; 
+            margin-left: auto;
+        }
 
         .grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 20px; }
         /* Stack columns on mobile */
@@ -55,6 +60,7 @@
     <h2>
         <span id="statusDot" class="status-dot"></span> 
         <span id="headerText">Initializing System...</span>
+        <span id="versionBadge" class="version-badge" style="display: none;"></span>
     </h2>
 
     <div class="grid">
@@ -98,6 +104,7 @@ level: high
     const btn = document.getElementById("convertBtn");
     const dot = document.getElementById("statusDot");
     const header = document.getElementById("headerText");
+    const versionBadge = document.getElementById("versionBadge");
 
     function log(msg, type='info') {
         const div = document.createElement("div");
@@ -122,9 +129,9 @@ level: high
             const deps = ["pyyaml", "packaging", "pyparsing", "typing-extensions", "requests", "jinja2", "pydantic"];
             await micropip.install(deps);
             
-            // 4. Install pySigma (Force install to bypass checks)
-            log("Installing pySigma...", "warn");
-            await pyodide.runPythonAsync(`import micropip; await micropip.install('pysigma', deps=False)`);
+            // 4. Install pySigma 1.0.0 (Force install to bypass checks)
+            log("Installing pySigma 1.0.0...", "warn");
+            await pyodide.runPythonAsync(`import micropip; await micropip.install('pysigma==1.0.0', deps=False)`);
 
             // 5. Install LogPoint Plugin
             const wheelName = "pysigma_backend_logpoint-0.3.0-py3-none-any.whl";
@@ -141,6 +148,19 @@ level: high
                 from sigma.backends.logpoint import Logpoint
                 print("Backend loaded successfully")
             `);
+
+            // 7. Detect and display pySigma version
+            try {
+                const version = await pyodide.runPythonAsync(`
+                    import sigma
+                    sigma.__version__
+                `);
+                log(`pySigma version: ${version}`, "info");
+                versionBadge.textContent = `v${version}`;
+                versionBadge.style.display = "inline-block";
+            } catch (versionError) {
+                log(`Could not detect version: ${versionError.message}`, "warn");
+            }
 
             // SUCCESS STATE
             log("✅ SYSTEM READY", "success");

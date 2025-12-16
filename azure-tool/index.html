@@ -150,13 +150,17 @@ level: high
             `);
 
             // 7. Detect and display pySigma version
-            const version = await pyodide.runPythonAsync(`
-                import sigma
-                sigma.__version__
-            `);
-            log(`pySigma version: ${version}`, "info");
-            versionBadge.textContent = `v${version}`;
-            versionBadge.style.display = "inline-block";
+            try {
+                const version = await pyodide.runPythonAsync(`
+                    import sigma
+                    sigma.__version__
+                `);
+                log(`pySigma version: ${version}`, "info");
+                versionBadge.textContent = `v${version}`;
+                versionBadge.style.display = "inline-block";
+            } catch (versionError) {
+                log(`Could not detect version: ${versionError.message}`, "warn");
+            }
 
             // SUCCESS STATE
             log("✅ SYSTEM READY", "success");

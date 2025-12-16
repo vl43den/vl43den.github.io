@@ -1,16 +1,9 @@
-This is a great point. If you are using a custom branch (like your "Knicks pipe patch"), it likely contains custom pipelines that I cannot guess.
-Instead of guessing, let's make the tool smart.
-I will update the code to auto-discover your pipelines.
- * The tool will inspect your installed sigma.pipelines.logpoint module.
- * It will automatically populate the dropdown with every pipeline found in your wheel file (including logpoint_windows, knicks_pipeline, or whatever you named it).
-Here is the Auto-Discovery Edition of your tool.
-index.html (Auto-Discover Pipelines)
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PySigma for LogPoint (Auto-Discovery)</title>
+    <title>PySigma for LogPoint (Serverless)</title>
     <script src="https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.js"></script>
     <style>
         /* Modern UI */
@@ -36,6 +29,12 @@ index.html (Auto-Discover Pipelines)
         
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
+        .version-badge { 
+            font-size: 0.75rem; font-weight: 600; color: #6366f1; 
+            background: #eef2ff; padding: 4px 12px; border-radius: 20px; 
+            margin-left: auto; border: 1px solid #c7d2fe;
+        }
+
         .grid { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 24px; }
         @media (min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
         
@@ -55,6 +54,7 @@ index.html (Auto-Discover Pipelines)
             background: #ffffff; outline: none; transition: all 0.2s; box-sizing: border-box;
         }
         textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        textarea#queryOutput { background: #fafafa; color: #1f2937; }
         
         .controls { 
             margin-top: 24px; display: flex; gap: 12px; 
@@ -66,25 +66,33 @@ index.html (Auto-Discover Pipelines)
             background: #f9fafb; color: #374151; font-size: 16px;
             cursor: pointer; outline: none; min-width: 200px; flex: 1;
         }
+        select:focus { border-color: #6366f1; }
+
         button { 
             flex: 2; min-width: 200px; padding: 14px 32px; 
             background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); 
             color: white; border: none; border-radius: 10px; 
             font-size: 16px; font-weight: 600; cursor: pointer; 
             transition: all 0.3s ease; opacity: 0.5; pointer-events: none;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
         }
         button.active { opacity: 1; pointer-events: auto; }
+        button.active:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4); }
 
         #log { 
             margin-top: 30px; background: #1e293b; color: #f1f5f9; padding: 20px; 
             border-radius: 12px; height: 180px; overflow-y: auto; 
             font-family: "SF Mono", monospace; font-size: 13px; border: 1px solid #334155;
         }
-        .log-entry { margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid #334155; }
+        .log-entry { margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid #334155; line-height: 1.5; }
         .log-success { color: #34d399; }
         .log-error { color: #f87171; }
         .log-info { color: #60a5fa; }
         .log-warn { color: #fbbf24; }
+        
+        textarea::-webkit-scrollbar, #log::-webkit-scrollbar { width: 8px; }
+        textarea::-webkit-scrollbar-track, #log::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        textarea::-webkit-scrollbar-thumb, #log::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -93,6 +101,7 @@ index.html (Auto-Discover Pipelines)
     <h2>
         <span id="statusDot" class="status-dot"></span> 
         <span id="headerText">Initializing System...</span>
+        <span id="versionBadge" class="version-badge" style="display: none;"></span>
     </h2>
 
     <div class="grid">
@@ -140,6 +149,7 @@ level: high
     const btn = document.getElementById("convertBtn");
     const dot = document.getElementById("statusDot");
     const header = document.getElementById("headerText");
+    const versionBadge = document.getElementById("versionBadge");
     const pipelineSelect = document.getElementById("pipelineSelector");
 
     function log(msg, type='info') {
@@ -163,6 +173,7 @@ level: high
             await micropip.install(deps);
             
             log("Installing pySigma...", "warn");
+            // Installing latest version compatible with deps=False
             await pyodide.runPythonAsync(`import micropip; await micropip.install('pysigma', deps=False)`);
 
             const wheelName = "pysigma_backend_logpoint-0.3.0-py3-none-any.whl";
@@ -177,11 +188,10 @@ level: high
             await pyodide.runPythonAsync(`from sigma.backends.logpoint import Logpoint`);
 
             // -----------------------------------------------------------
-            // AUTO-DISCOVER PIPELINES
+            // AUTO-DISCOVER PIPELINES (STRICT FILTER)
             // -----------------------------------------------------------
             log("Scanning for Pipelines...", "info");
             
-            // This Python script finds every function in sigma.pipelines.logpoint
             await pyodide.runPythonAsync(`
                 import pkgutil
                 import inspect
@@ -190,50 +200,78 @@ level: high
 
                 found_pipelines = []
 
-                # 1. Look for functions in the module that return a ProcessingPipeline
-                # This works for standard pySigma structure
-                for name, obj in inspect.getmembers(sigma.pipelines.logpoint):
-                    if inspect.isfunction(obj):
-                        # Simple heuristic: if it has 'pipeline' in the name, grab it
-                        if "pipeline" in name:
-                            found_pipelines.append(name)
-                
-                # 2. Also check submodules (common in complex backends)
+                # 1. Force load submodules so functions register
                 path = sigma.pipelines.logpoint.__path__
                 for loader, module_name, is_pkg in pkgutil.walk_packages(path):
-                    found_pipelines.append(module_name)
+                    try:
+                        __import__(f"sigma.pipelines.logpoint.{module_name}")
+                    except:
+                        pass
+
+                # 2. Strict Search: Find only FUNCTIONS, ignore MODULES (folders)
+                # We search the main package and the submodules we just loaded
                 
-                # Remove duplicates and sort
+                def scan_module(module_obj):
+                    results = []
+                    for name, obj in inspect.getmembers(module_obj):
+                        if inspect.isfunction(obj):
+                            # Filter: Must have 'pipeline' in name to avoid util functions
+                            if "pipeline" in name:
+                                results.append(name)
+                    return results
+
+                # Scan top level
+                found_pipelines.extend(scan_module(sigma.pipelines.logpoint))
+                
+                # Scan submodules
+                for loader, module_name, is_pkg in pkgutil.walk_packages(path):
+                    try:
+                        submod = getattr(sigma.pipelines.logpoint, module_name)
+                        found_pipelines.extend(scan_module(submod))
+                    except:
+                        pass
+
+                # Deduplicate and sort
                 found_pipelines = sorted(list(set(found_pipelines)))
-                
-                # Send to JS
                 pipeline_list_json = json.dumps(found_pipelines)
             `);
 
-            // Read the list from Python
+            // Populate JS Dropdown
             const pipelineList = JSON.parse(pyodide.globals.get("pipeline_list_json"));
-            
-            // Clear dropdown
             pipelineSelect.innerHTML = "";
             
-            // Add Default Option
             const defaultOpt = document.createElement("option");
             defaultOpt.value = "none";
             defaultOpt.text = "Raw (No Pipeline)";
             pipelineSelect.appendChild(defaultOpt);
 
-            // Add Discovered Pipelines
             if (pipelineList.length > 0) {
-                log(`Found ${pipelineList.length} pipelines: ${pipelineList.join(", ")}`, "success");
+                log(`Found ${pipelineList.length} pipelines`, "success");
                 pipelineList.forEach(name => {
                     const opt = document.createElement("option");
                     opt.value = name;
-                    opt.text = name; // e.g., "logpoint_windows", "knicks_pipeline"
+                    opt.text = name; 
                     pipelineSelect.appendChild(opt);
                 });
             } else {
                 log("No specific pipelines found (using Raw mode)", "warn");
             }
+
+            // Detect Version
+            try {
+                const versionResult = await pyodide.runPythonAsync(`
+                    import importlib.metadata
+                    try:
+                        version = importlib.metadata.version('pysigma')
+                        version
+                    except: 
+                        "1.0.0"
+                `);
+                if (versionResult) {
+                    versionBadge.textContent = `pySigma v${versionResult}`;
+                    versionBadge.style.display = "inline-block";
+                }
+            } catch (versionError) { }
 
             log("System Ready", "success");
             dot.classList.add("ready");
@@ -261,7 +299,7 @@ level: high
         }
 
         outputBox.value = "Converting...";
-        log(`Converting using pipeline: '${pipelineChoice}'...`, "info");
+        log(`Converting using: '${pipelineChoice}'...`, "info");
 
         try {
             pyodide.globals.set("user_rule", inputRule);
@@ -280,21 +318,36 @@ level: high
                     active_pipeline = None
                     
                     if user_pipeline_name != "none":
-                        # Dynamic Import: We get the function by name from the module
+                        # Now we know it's a valid function name because we filtered the list
+                        # We just need to find where it lives (top level or submodule)
+                        
+                        target_func = None
+                        
+                        # Check Top Level
                         if hasattr(sigma.pipelines.logpoint, user_pipeline_name):
-                            pipeline_func = getattr(sigma.pipelines.logpoint, user_pipeline_name)
-                            
-                            # Call the function to get the pipeline object
-                            # Most pipeline functions take no args, but some might.
-                            # We assume standard pySigma signature (no args).
-                            active_pipeline = pipeline_func()
+                            target_func = getattr(sigma.pipelines.logpoint, user_pipeline_name)
                         else:
-                            raise Exception(f"Pipeline '{user_pipeline_name}' not found in module.")
+                            # Check Submodules
+                            import pkgutil
+                            path = sigma.pipelines.logpoint.__path__
+                            for loader, module_name, is_pkg in pkgutil.walk_packages(path):
+                                try:
+                                    submod = getattr(sigma.pipelines.logpoint, module_name)
+                                    if hasattr(submod, user_pipeline_name):
+                                        target_func = getattr(submod, user_pipeline_name)
+                                        break
+                                except: pass
+
+                        if target_func and inspect.isfunction(target_func):
+                            active_pipeline = target_func()
+                        else:
+                            raise Exception(f"Pipeline function '{user_pipeline_name}' not found.")
 
                     # 2. Convert
                     backend = Logpoint(processing_pipeline=active_pipeline)
                     collection = SigmaCollection.from_yaml(user_rule)
                     queries = backend.convert(collection)
+                    
                     global_output = "\\n".join(queries)
                     
                 except Exception as e:
@@ -321,4 +374,3 @@ level: high
 
 </body>
 </html>
-

@@ -58,30 +58,28 @@
             // ---------------------------------------------------------
             // Step 3: COMPLETE Dependency Injection
             // ---------------------------------------------------------
-            // We are manually installing EVERYTHING pySigma might need
-            // to avoid any more "ModuleNotFoundError" crashes.
-            log("Pre-loading ALL dependencies (Jinja2, Pydantic, etc.)...", 'warn');
+            log("Pre-loading ALL dependencies...", 'warn');
             
+            // We include ALL known dependencies to prevent ModuleNotFoundErrors
             const dependencies = [
-                "pyyaml",             // Config parsing
-                "packaging",          // Version checking
-                "pyparsing",          // Query parsing
-                "typing-extensions",  // Type hints
-                "requests",           // HTTP requests
-                "jinja2",             // Templating (Missing in previous error)
-                "pydantic"            // Data validation (Commonly needed)
+                "pyyaml",             
+                "packaging",          
+                "pyparsing",          
+                "typing-extensions",  
+                "requests",           
+                "jinja2",             
+                "pydantic"            
             ];
             
             await micropip.install(dependencies); 
-            log("✅ Dependencies loaded: " + dependencies.join(", "), 'success');
+            log("✅ Dependencies loaded.", 'success');
 
             // ---------------------------------------------------------
-            // Step 4: Force Install pySigma (Latest)
+            // Step 4: Force Install pySigma
             // ---------------------------------------------------------
             log("Force-installing pySigma (Latest)...", 'warn');
             await pyodide.runPythonAsync(`
                 import micropip
-                # deps=False stops version conflicts but requires Step 3
                 await micropip.install('pysigma', deps=False)
             `);
             log("✅ pySigma installed.", 'success');
@@ -93,7 +91,6 @@
             
             log(`Downloading backend: ${backendFilename}...`, 'info');
             
-            // Safety check
             const check = await fetch(backendFilename);
             if (!check.ok) {
                 throw new Error(`404 Not Found: ${backendFilename}.`);
@@ -103,7 +100,7 @@
             log("✅ LogPoint Backend installed.", 'success');
 
             // ---------------------------------------------------------
-            // Step 6: Final Verification
+            // Step 6: Final Verification (SMART IMPORT)
             // ---------------------------------------------------------
             log("Running system diagnostics...", 'info');
             
@@ -112,17 +109,28 @@
                 import yaml
                 import jinja2
                 
+                # We try both potential class names to be safe
+                backend_class = None
                 try:
-                    from sigma.backends.logpoint import LogPointBackend
-                    status_msg = "INSTALLED & LOADED"
-                except ImportError as e:
-                    status_msg = f"IMPORT ERROR: {str(e)}"
-                    raise e
+                    # Try Name 1: Logpoint (Seen in your error logs)
+                    from sigma.backends.logpoint import Logpoint
+                    backend_class = Logpoint
+                    name_found = "Logpoint"
+                except ImportError:
+                    try:
+                        # Try Name 2: LogpointBackend (Standard naming convention)
+                        from sigma.backends.logpoint import LogpointBackend
+                        backend_class = LogpointBackend
+                        name_found = "LogpointBackend"
+                    except ImportError:
+                        # Debug: If both fail, print what IS inside the module
+                        import sigma.backends.logpoint
+                        print("DEBUG: Available names in module:", dir(sigma.backends.logpoint))
+                        raise Exception("Could not find 'Logpoint' class in module.")
 
                 print("-" * 30)
                 print(f"CORE: pySigma v{sigma.__version__}")
-                print(f"BACKEND: {status_msg}")
-                print(f"DEPS: Jinja2 v{jinja2.__version__}")
+                print(f"BACKEND: Found class '{name_found}' -> SUCCESS")
                 print("-" * 30)
             `);
 

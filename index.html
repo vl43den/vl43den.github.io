@@ -25,6 +25,7 @@ title: Home
       {% for proj in site.projects %}
         <li><a href="{{ proj.url | relative_url }}">{{ proj.title }}</a></li>
       {% endfor %}
+      <li><a href="/azure-tool/index.html">PySigma for LogPoint (Serverless)</a></li>
       {% if site.projects == empty %}
         <li>No projects yet.</li>
       {% endif %}

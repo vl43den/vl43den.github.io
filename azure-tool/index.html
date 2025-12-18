@@ -4,107 +4,576 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PySigma for LogPoint (Serverless)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.js"></script>
     <style>
-        /* Modern UI */
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            padding: 0; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: #333; min-height: 100vh;
-        }
-        .app-container { 
-            max-width: 1200px; margin: 20px auto; background: white; padding: 30px; 
-            border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.15); 
-        }
-        h2 { 
-            margin-top: 0; color: #2c3e50; display: flex; align-items: center; gap: 12px; 
-            font-size: 1.5rem; font-weight: 700; 
-        }
-        .status-dot { 
-            height: 14px; width: 14px; background-color: #ccc; border-radius: 50%; 
-            display: inline-block; transition: all 0.3s ease;
-        }
-        .status-dot.ready { background-color: #10b981; box-shadow: 0 0 12px #10b981; animation: pulse 2s infinite; }
-        .status-dot.error { background-color: #ef4444; box-shadow: 0 0 12px #ef4444; }
-        
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-
-        .version-badge { 
-            font-size: 0.75rem; font-weight: 600; color: #6366f1; 
-            background: #eef2ff; padding: 4px 12px; border-radius: 20px; 
-            margin-left: auto; border: 1px solid #c7d2fe;
+        /* ========================================
+           Matching Main Site Design
+           ======================================== */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent-color: #818cf8;
+            --accent-hover: #a5b4fc;
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: rgba(18, 18, 26, 0.8);
+            --bg-glass: rgba(255, 255, 255, 0.03);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(129, 140, 248, 0.3);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --shadow-glow: 0 0 40px rgba(102, 126, 234, 0.15);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .grid { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 24px; }
-        @media (min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
-        
-        .editor-section { 
-            display: flex; flex-direction: column; background: #f9fafb; 
-            padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        label { 
-            font-weight: 600; margin-bottom: 10px; color: #374151; font-size: 0.95rem;
-            text-transform: uppercase; letter-spacing: 0.5px;
+
+        html {
+            scroll-behavior: smooth;
         }
-        
-        textarea { 
-            width: 100%; height: 350px; padding: 16px; border: 2px solid #e5e7eb; 
-            border-radius: 10px; font-family: "SF Mono", "Monaco", "Cascadia Code", "Roboto Mono", monospace; 
-            font-size: 13px; line-height: 1.6; resize: vertical; 
-            background: #ffffff; outline: none; transition: all 0.2s; box-sizing: border-box;
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
-        textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
-        textarea#queryOutput { background: #fafafa; color: #1f2937; }
-        
-        .controls { 
-            margin-top: 24px; display: flex; gap: 12px; 
-            justify-content: center; flex-wrap: wrap; 
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(99, 102, 241, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
         }
-        
+
+        /* Grid pattern */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ========================================
+           Header / Navigation
+           ======================================== */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .site-header nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .site-header nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            letter-spacing: 0.02em;
+            transition: var(--transition-smooth);
+            border: 1px solid transparent;
+        }
+
+        .site-header nav a:hover {
+            color: var(--text-primary);
+            background: var(--bg-glass);
+            border-color: var(--border-color);
+        }
+
+        /* ========================================
+           App Container
+           ======================================== */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 6rem auto 3rem;
+            padding: 3rem;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 
+                var(--shadow-glow),
+                0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Decorative corners */
+        .app-container::before,
+        .app-container::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            pointer-events: none;
+        }
+
+        .app-container::before {
+            top: -1px;
+            left: -1px;
+            border-top: 2px solid var(--accent-color);
+            border-left: 2px solid var(--accent-color);
+            border-radius: 24px 0 0 0;
+            opacity: 0.5;
+        }
+
+        .app-container::after {
+            bottom: -1px;
+            right: -1px;
+            border-bottom: 2px solid var(--accent-color);
+            border-right: 2px solid var(--accent-color);
+            border-radius: 0 0 24px 0;
+            opacity: 0.5;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========================================
+           Title Header
+           ======================================== */
+        .app-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .app-title h1 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            height: 12px;
+            width: 12px;
+            background-color: var(--text-muted);
+            border-radius: 50%;
+            transition: var(--transition-smooth);
+        }
+
+        .status-dot.ready {
+            background-color: #10b981;
+            box-shadow: 0 0 12px #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.error {
+            background-color: #ef4444;
+            box-shadow: 0 0 12px #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .version-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            background: rgba(129, 140, 248, 0.1);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-accent);
+            margin-left: auto;
+        }
+
+        /* ========================================
+           Editor Grid
+           ======================================== */
+        .editor-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 900px) {
+            .editor-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .editor-section {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-glass);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition-smooth);
+        }
+
+        .editor-section:focus-within {
+            border-color: var(--border-accent);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.1);
+        }
+
+        .editor-section label {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        textarea {
+            width: 100%;
+            height: 320px;
+            padding: 1.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            resize: vertical;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        textarea:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        textarea#queryOutput {
+            background: var(--bg-primary);
+        }
+
+        /* ========================================
+           Controls
+           ======================================== */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
         select {
-            padding: 14px; border-radius: 10px; border: 1px solid #c7d2fe;
-            background: #f9fafb; color: #374151; font-size: 16px;
-            cursor: pointer; outline: none; min-width: 200px; flex: 1;
+            flex: 1;
+            min-width: 200px;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            transition: var(--transition-smooth);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
         }
-        select:focus { border-color: #6366f1; }
 
-        button { 
-            flex: 2; min-width: 200px; padding: 14px 32px; 
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); 
-            color: white; border: none; border-radius: 10px; 
-            font-size: 16px; font-weight: 600; cursor: pointer; 
-            transition: all 0.3s ease; opacity: 0.5; pointer-events: none;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
         }
-        button.active { opacity: 1; pointer-events: auto; }
-        button.active:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4); }
 
-        #log { 
-            margin-top: 30px; background: #1e293b; color: #f1f5f9; padding: 20px; 
-            border-radius: 12px; height: 180px; overflow-y: auto; 
-            font-family: "SF Mono", monospace; font-size: 13px; border: 1px solid #334155;
+        select option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
         }
-        .log-entry { margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid #334155; line-height: 1.5; }
+
+        button#convertBtn {
+            flex: 2;
+            min-width: 200px;
+            padding: 1rem 2rem;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            opacity: 0.5;
+            pointer-events: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button#convertBtn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        button#convertBtn.active {
+            opacity: 1;
+            pointer-events: auto;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button#convertBtn.active:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        button#convertBtn.active:hover::before {
+            opacity: 1;
+        }
+
+        button#convertBtn.active:active {
+            transform: translateY(0);
+        }
+
+        /* ========================================
+           Log Console
+           ======================================== */
+        .log-container {
+            margin-top: 2rem;
+        }
+
+        .log-container h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        #log {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            height: 180px;
+            overflow-y: auto;
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
         .log-success { color: #34d399; }
         .log-error { color: #f87171; }
         .log-info { color: #60a5fa; }
         .log-warn { color: #fbbf24; }
-        
-        textarea::-webkit-scrollbar, #log::-webkit-scrollbar { width: 8px; }
-        textarea::-webkit-scrollbar-track, #log::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        textarea::-webkit-scrollbar-thumb, #log::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* ========================================
+           Scrollbar
+           ======================================== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* ========================================
+           Selection
+           ======================================== */
+        ::selection {
+            background: rgba(129, 140, 248, 0.3);
+            color: #fff;
+        }
+
+        /* ========================================
+           Footer
+           ======================================== */
+        .site-footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            background: rgba(10, 10, 15, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+        }
+
+        .back-link:hover {
+            color: var(--accent-hover);
+        }
+
+        /* ========================================
+           Responsive
+           ======================================== */
+        @media (max-width: 768px) {
+            .site-header {
+                padding: 0.75rem 1rem;
+            }
+
+            .site-header nav a {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            .app-container {
+                margin: 5rem 1rem 2rem;
+                padding: 2rem 1.5rem;
+                border-radius: 20px;
+            }
+
+            .app-container::before,
+            .app-container::after {
+                width: 50px;
+                height: 50px;
+            }
+
+            .app-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .version-badge {
+                margin-left: 0;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            select, button#convertBtn {
+                width: 100%;
+                min-width: auto;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <h2>
-        <span id="statusDot" class="status-dot"></span> 
-        <span id="headerText">Initializing System...</span>
-        <span id="versionBadge" class="version-badge" style="display: none;"></span>
-    </h2>
+<!-- Site Header -->
+<header class="site-header">
+    <nav>
+        <a href="../index.html">Home</a>
+        <a href="../blog/index.html">Blog</a>
+        <a href="../writeups/index.html">Write-Ups</a>
+        <a href="../projects/index.html">Projects</a>
+        <a href="../about/index.html">About</a>
+    </nav>
+</header>
 
-    <div class="grid">
+<div class="app-container">
+    <div class="app-title">
+        <div class="status-indicator">
+            <span id="statusDot" class="status-dot"></span>
+        </div>
+        <h1 id="headerText">Initializing System...</h1>
+        <span id="versionBadge" class="version-badge" style="display: none;"></span>
+    </div>
+
+    <div class="editor-grid">
         <div class="editor-section">
             <label>Sigma Rule (YAML)</label>
             <textarea id="sigmaInput" spellcheck="false">
@@ -140,8 +609,19 @@ level: high
         <button id="convertBtn" onclick="runConversion()">Convert to LogPoint</button>
     </div>
 
-    <div id="log"></div>
+    <div class="log-container">
+        <h3>System Log</h3>
+        <div id="log"></div>
+    </div>
 </div>
+
+<!-- Site Footer -->
+<footer class="site-footer">
+    <a href="../index.html" class="back-link">
+        <span>←</span>
+        <span>Back to Home</span>
+    </a>
+</footer>
 
 <script>
     let pyodide = null;
@@ -173,7 +653,6 @@ level: high
             await micropip.install(deps);
             
             log("Installing pySigma...", "warn");
-            // Installing latest version compatible with deps=False
             await pyodide.runPythonAsync(`import micropip; await micropip.install('pysigma', deps=False)`);
 
             const wheelName = "pysigma_backend_logpoint-0.3.0-py3-none-any.whl";
@@ -187,9 +666,6 @@ level: high
             log("Verifying Backend...", "info");
             await pyodide.runPythonAsync(`from sigma.backends.logpoint import Logpoint`);
 
-            // -----------------------------------------------------------
-            // AUTO-DISCOVER PIPELINES (STRICT FILTER)
-            // -----------------------------------------------------------
             log("Scanning for Pipelines...", "info");
             
             await pyodide.runPythonAsync(`
@@ -200,7 +676,6 @@ level: high
 
                 found_pipelines = []
 
-                # 1. Force load submodules so functions register
                 path = sigma.pipelines.logpoint.__path__
                 for loader, module_name, is_pkg in pkgutil.walk_packages(path):
                     try:
@@ -208,22 +683,16 @@ level: high
                     except:
                         pass
 
-                # 2. Strict Search: Find only FUNCTIONS, ignore MODULES (folders)
-                # We search the main package and the submodules we just loaded
-                
                 def scan_module(module_obj):
                     results = []
                     for name, obj in inspect.getmembers(module_obj):
                         if inspect.isfunction(obj):
-                            # Filter: Must have 'pipeline' in name to avoid util functions
                             if "pipeline" in name:
                                 results.append(name)
                     return results
 
-                # Scan top level
                 found_pipelines.extend(scan_module(sigma.pipelines.logpoint))
                 
-                # Scan submodules
                 for loader, module_name, is_pkg in pkgutil.walk_packages(path):
                     try:
                         submod = getattr(sigma.pipelines.logpoint, module_name)
@@ -231,12 +700,10 @@ level: high
                     except:
                         pass
 
-                # Deduplicate and sort
                 found_pipelines = sorted(list(set(found_pipelines)))
                 pipeline_list_json = json.dumps(found_pipelines)
             `);
 
-            // Populate JS Dropdown
             const pipelineList = JSON.parse(pyodide.globals.get("pipeline_list_json"));
             pipelineSelect.innerHTML = "";
             
@@ -257,7 +724,6 @@ level: high
                 log("No specific pipelines found (using Raw mode)", "warn");
             }
 
-            // Detect Version
             try {
                 const versionResult = await pyodide.runPythonAsync(`
                     import importlib.metadata
@@ -275,7 +741,7 @@ level: high
 
             log("System Ready", "success");
             dot.classList.add("ready");
-            header.textContent = "PySigma Converter (Ready)";
+            header.textContent = "PySigma Converter";
             btn.classList.add("active");
             document.getElementById("queryOutput").placeholder = "System ready. Click Convert.";
 
@@ -314,20 +780,14 @@ level: high
                 global_output = ""
                 
                 try:
-                    # 1. Resolve Pipeline
                     active_pipeline = None
                     
                     if user_pipeline_name != "none":
-                        # Now we know it's a valid function name because we filtered the list
-                        # We just need to find where it lives (top level or submodule)
-                        
                         target_func = None
                         
-                        # Check Top Level
                         if hasattr(sigma.pipelines.logpoint, user_pipeline_name):
                             target_func = getattr(sigma.pipelines.logpoint, user_pipeline_name)
                         else:
-                            # Check Submodules
                             import pkgutil
                             path = sigma.pipelines.logpoint.__path__
                             for loader, module_name, is_pkg in pkgutil.walk_packages(path):
@@ -343,7 +803,6 @@ level: high
                         else:
                             raise Exception(f"Pipeline function '{user_pipeline_name}' not found.")
 
-                    # 2. Convert
                     backend = Logpoint(processing_pipeline=active_pipeline)
                     collection = SigmaCollection.from_yaml(user_rule)
                     queries = backend.convert(collection)

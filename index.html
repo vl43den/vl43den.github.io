@@ -3,38 +3,44 @@ layout: default
 title: Home
 ---
 
-<div class="page-content">
-  <h1>My CTF Write-Ups & Projects</h1>
+<h1>CTF Write-Ups & Projects</h1>
 
-  <section>
-    <h2>Write-Ups</h2>
-    {% assign grouped = site.ctfs | group_by: 'event' %}
-    <ul>
+<section>
+  <h2>Write-Ups</h2>
+  {% assign grouped = site.ctfs | group_by: 'event' %}
+  <ul>
     {% for grp in grouped %}
-      <li><a href="{{ '/writeups/' | append: grp.name | append: '/' | relative_url }}">{{ grp.name | capitalize }}</a> <small>({{ grp.items | size }})</small></li>
+    <li>
+      <a href="{{ '/writeups/' | append: grp.name | append: '/' | relative_url }}">{{ grp.name | capitalize }}</a>
+      <small>{{ grp.items | size }} challenge{% if grp.items.size != 1 %}s{% endif %}</small>
+    </li>
     {% endfor %}
     {% if grouped == empty %}
-      <li>No write-ups yet.</li>
+    <li>No write-ups yet.</li>
     {% endif %}
-    </ul>
-  </section>
+  </ul>
+</section>
 
-  <section>
-    <h2>Projects</h2>
-    <ul>
-      {% for proj in site.projects %}
-        <li><a href="{{ proj.url | relative_url }}">{{ proj.title }}</a></li>
-      {% endfor %}
-      <li><a href="/azure-tool/index.html">PySigma for LogPoint (Serverless)</a></li>
-      {% if site.projects == empty %}
-        <li>No projects yet.</li>
-      {% endif %}
-    </ul>
-  </section>
+<section>
+  <h2>Projects</h2>
+  <ul>
+    {% for proj in site.projects %}
+    <li>
+      <a href="{{ proj.url | relative_url }}">{{ proj.title }}</a>
+    </li>
+    {% endfor %}
+    <li>
+      <a href="/azure-tool/index.html">PySigma for LogPoint (Serverless)</a>
+      <small>Web Tool</small>
+    </li>
+    {% if site.projects == empty %}
+    <li>No projects yet.</li>
+    {% endif %}
+  </ul>
+</section>
 
-  <section class="widgets">
-    <div class="widget"><a href="{{ '/blog/' | relative_url }}">Go to Blog</a></div>
-    <div class="widget"><a href="{{ '/projects/' | relative_url }}">View Projects</a></div>
-    <div class="widget"><a href="{{ '/about/' | relative_url }}">About Me</a></div>
-  </section>
-</div>
+<section class="widgets">
+  <div class="widget"><a href="{{ '/blog/' | relative_url }}">Blog</a></div>
+  <div class="widget"><a href="{{ '/projects/' | relative_url }}">Projects</a></div>
+  <div class="widget"><a href="{{ '/about/' | relative_url }}">About Me</a></div>
+</section>

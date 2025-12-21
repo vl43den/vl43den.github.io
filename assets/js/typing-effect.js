@@ -1,49 +1,60 @@
-document.addEventListener('DOMContentLoaded', function() {
-  // Find the first h1 on the homepage only
-  if (window.location.pathname === '/' || window.location.pathname.endsWith('/index.html')) {
-    const title = document.querySelector('h1');
-    if (!title) return;
-    
-    // Save the original text and clear it
-    const text = title.textContent;
-    title.innerHTML = '';
-    
-    // Create a span with cursor for typing effect
-    const typingSpan = document.createElement('span');
-    title.appendChild(typingSpan);
-    
-    // Create cursor element
-    const cursor = document.createElement('span');
-    cursor.textContent = '|';
-    cursor.style.opacity = '1';
-    cursor.style.animation = 'blink 1s infinite';
-    cursor.style.marginLeft = '2px';
-    title.appendChild(cursor);
-    
-    // Add blinking cursor style
-    if (!document.getElementById('cursor-style')) {
-      const style = document.createElement('style');
-      style.id = 'cursor-style';
-      style.textContent = '@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }';
-      document.head.appendChild(style);
-    }
-    
-    // Type out text
-    let i = 0;
-    function typeWriter() {
-      if (i < text.length) {
-        typingSpan.textContent += text.charAt(i);
-        i++;
-        setTimeout(typeWriter, 80);
+/**
+ * Typing Effect - Cycles through roles in the hero section
+ */
+(function () {
+  const TYPING_SPEED = 80;
+  const DELETE_SPEED = 50;
+  const PAUSE_DURATION = 2000;
+
+  function init() {
+    const typingElement = document.getElementById('typing-text');
+    if (!typingElement) return;
+
+    const roles = window.typingRoles || [
+      "Security Researcher",
+      "CTF Player",
+      "Developer"
+    ];
+
+    let roleIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+
+    function type() {
+      const currentRole = roles[roleIndex];
+
+      if (isDeleting) {
+        typingElement.textContent = currentRole.substring(0, charIndex - 1);
+        charIndex--;
+
+        if (charIndex === 0) {
+          isDeleting = false;
+          roleIndex = (roleIndex + 1) % roles.length;
+          setTimeout(type, 500);
+        } else {
+          setTimeout(type, DELETE_SPEED);
+        }
       } else {
-        // Remove cursor after typing is complete
-        setTimeout(() => {
-          cursor.remove();
-        }, 1500);
+        typingElement.textContent = currentRole.substring(0, charIndex + 1);
+        charIndex++;
+
+        if (charIndex === currentRole.length) {
+          isDeleting = true;
+          setTimeout(type, PAUSE_DURATION);
+        } else {
+          setTimeout(type, TYPING_SPEED);
+        }
       }
     }
-    
-    // Start typing after a short delay
-    setTimeout(typeWriter, 500);
+
+    // Start after a short delay
+    setTimeout(type, 1000);
   }
-});
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+

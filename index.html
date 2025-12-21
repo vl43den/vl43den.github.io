@@ -3,44 +3,142 @@ layout: default
 title: Home
 ---
 
-<h1>CTF Write-Ups & Projects</h1>
+<!-- Hero Section -->
+<section class="hero animate-on-scroll">
+  <h1>Vl43den</h1>
+  <p class="hero-subtitle">Welcome to my corner of the internet</p>
+  <div class="hero-roles">
+    <span id="typing-text"></span><span class="cursor"></span>
+  </div>
+  <div class="hero-cta">
+    <a href="{{ '/writeups/' | relative_url }}" class="btn btn-primary">📝 View Write-Ups</a>
+    <a href="{{ '/projects/' | relative_url }}" class="btn btn-secondary">🚀 Explore Projects</a>
+  </div>
+</section>
 
-<section>
+<!-- Stats Widget -->
+<section class="animate-on-scroll">
+  <div class="stats-widget">
+    <div class="stat-item">
+      <div class="stat-value">{{ site.ctfs | size }}</div>
+      <div class="stat-label">Write-Ups</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ site.projects | size | plus: 1 }}</div>
+      <div class="stat-label">Projects</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">5+</div>
+      <div class="stat-label">CTF Events</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">∞</div>
+      <div class="stat-label">Learning</div>
+    </div>
+  </div>
+</section>
+
+<!-- Skills Section -->
+<section class="skills-section animate-on-scroll">
+  <h2>Tech Stack</h2>
+  <ul class="skills-grid stagger-children">
+    <li class="skill-item animate-on-scroll"><span class="skill-icon">🐍</span> Python</li>
+    <li class="skill-item animate-on-scroll"><span class="skill-icon">🔐</span> Cybersecurity</li>
+    <li class="skill-item animate-on-scroll"><span class="skill-icon">☁️</span> Azure</li>
+    <li class="skill-item animate-on-scroll"><span class="skill-icon">🐧</span> Linux</li>
+    <li class="skill-item animate-on-scroll"><span class="skill-icon">🌐</span> Web Security</li>
+    <li class="skill-item animate-on-scroll"><span class="skill-icon">🔍</span> SIEM/Detection</li>
+    <li class="skill-item animate-on-scroll"><span class="skill-icon">⚡</span> CTF</li>
+    <li class="skill-item animate-on-scroll"><span class="skill-icon">📊</span> Sigma Rules</li>
+  </ul>
+</section>
+
+<!-- Search -->
+<section class="animate-on-scroll">
+  <div class="search-container">
+    <span class="search-icon">🔍</span>
+    <input type="text" class="search-input" placeholder="Search write-ups and projects...">
+  </div>
+</section>
+
+<!-- Write-Ups Section -->
+<section class="search-section animate-on-scroll">
   <h2>Write-Ups</h2>
   {% assign grouped = site.ctfs | group_by: 'event' %}
-  <ul>
+  <ul class="card-grid stagger-children">
     {% for grp in grouped %}
-    <li>
-      <a href="{{ '/writeups/' | append: grp.name | append: '/' | relative_url }}">{{ grp.name | capitalize }}</a>
-      <small>{{ grp.items | size }} challenge{% if grp.items.size != 1 %}s{% endif %}</small>
+    <li class="card animate-on-scroll" data-searchable>
+      <div class="card-icon">🏴</div>
+      <div class="card-title">
+        <a href="{{ '/writeups/' | append: grp.name | append: '/' | relative_url }}">{{ grp.name | capitalize }}</a>
+      </div>
+      <div class="card-meta">
+        <span class="card-tag">{{ grp.items | size }} challenge{% if grp.items.size != 1 %}s{% endif %}</span>
+      </div>
     </li>
     {% endfor %}
     {% if grouped == empty %}
-    <li>No write-ups yet.</li>
+    <li class="card" data-searchable>
+      <div class="card-icon">📝</div>
+      <div class="card-title">No write-ups yet</div>
+      <div class="card-meta">Check back soon!</div>
+    </li>
     {% endif %}
   </ul>
+  <p class="no-results hidden" style="text-align: center; color: var(--text-muted); padding: 2rem;">No matching
+    write-ups found.</p>
 </section>
 
-<section>
+<!-- Projects Section -->
+<section class="search-section animate-on-scroll">
   <h2>Projects</h2>
-  <ul>
+  <ul class="card-grid stagger-children">
     {% for proj in site.projects %}
-    <li>
-      <a href="{{ proj.url | relative_url }}">{{ proj.title }}</a>
+    <li class="card animate-on-scroll" data-searchable>
+      <div class="card-icon">💻</div>
+      <div class="card-title">
+        <a href="{{ proj.url | relative_url }}">{{ proj.title }}</a>
+      </div>
+      <div class="card-meta">
+        <span class="card-tag">Project</span>
+      </div>
     </li>
     {% endfor %}
-    <li>
-      <a href="/azure-tool/index.html">PySigma for LogPoint (Serverless)</a>
-      <small>Web Tool</small>
+    <li class="card animate-on-scroll" data-searchable>
+      <div class="card-icon">🔄</div>
+      <div class="card-title">
+        <a href="/azure-tool/index.html">PySigma for LogPoint</a>
+      </div>
+      <div class="card-meta">
+        <span class="card-tag">Web Tool</span>
+      </div>
     </li>
     {% if site.projects == empty %}
-    <li>No projects yet.</li>
+    <li class="card" data-searchable>
+      <div class="card-icon">🚀</div>
+      <div class="card-title">More coming soon</div>
+      <div class="card-meta">Stay tuned!</div>
+    </li>
     {% endif %}
   </ul>
+  <p class="no-results hidden" style="text-align: center; color: var(--text-muted); padding: 2rem;">No matching projects
+    found.</p>
 </section>
 
-<section class="widgets">
-  <div class="widget"><a href="{{ '/blog/' | relative_url }}">Blog</a></div>
-  <div class="widget"><a href="{{ '/projects/' | relative_url }}">Projects</a></div>
-  <div class="widget"><a href="{{ '/about/' | relative_url }}">About Me</a></div>
+<!-- Quick Links -->
+<section class="widgets animate-on-scroll">
+  <div class="widget"><a href="{{ '/blog/' | relative_url }}">📰 Blog</a></div>
+  <div class="widget"><a href="{{ '/projects/' | relative_url }}">🛠️ All Projects</a></div>
+  <div class="widget"><a href="{{ '/about/' | relative_url }}">👤 About Me</a></div>
 </section>
+
+<!-- Typing Animation Data -->
+<script>
+  window.typingRoles = [
+    "Security Researcher 🔐",
+    "CTF Player 🏴",
+    "Python Developer 🐍",
+    "Azure Enthusiast ☁️",
+    "Detection Engineer 🔍"
+  ];
+</script>

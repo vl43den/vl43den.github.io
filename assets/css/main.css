@@ -2,7 +2,7 @@
    Modern Dark Theme - Premium Design
    ======================================== */
 
-/* CSS Custom Properties */
+/* CSS Custom Properties - Dark Theme (Default) */
 :root {
   --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --accent-color: #818cf8;
@@ -20,8 +20,51 @@
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Light Theme */
+.light-theme {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #e2e8f0;
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-glass: rgba(0, 0, 0, 0.02);
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-accent: rgba(102, 126, 234, 0.4);
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --shadow-glow: 0 0 40px rgba(102, 126, 234, 0.1);
+}
+
+.light-theme body::before {
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(102, 126, 234, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(118, 75, 162, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+}
+
+.light-theme body::after {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+}
+
+.light-theme header {
+  background: rgba(248, 250, 252, 0.9);
+}
+
+.light-theme footer {
+  background: rgba(248, 250, 252, 0.7);
+}
+
+.light-theme h1 {
+  background: linear-gradient(135deg, #1e293b 0%, #667eea 50%, #764ba2 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
 /* Reset & Base */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -48,7 +91,7 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: 
+  background:
     radial-gradient(ellipse at 20% 20%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%),
     radial-gradient(ellipse at 50% 50%, rgba(99, 102, 241, 0.03) 0%, transparent 70%);
@@ -64,7 +107,7 @@ body::after {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: 
+  background-image:
     linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
   background-size: 60px 60px;
@@ -76,7 +119,12 @@ body::after {
    Typography
    ======================================== */
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 700;
   line-height: 1.3;
   color: var(--text-primary);
@@ -201,7 +249,7 @@ header nav a.active {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-color);
   border-radius: 24px;
-  box-shadow: 
+  box-shadow:
     var(--shadow-glow),
     0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
@@ -242,14 +290,14 @@ section {
   margin-bottom: 2.5rem;
 }
 
-section > ul {
+section>ul {
   list-style: none;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-section > ul > li {
+section>ul>li {
   padding: 1rem 1.25rem;
   background: var(--bg-glass);
   border: 1px solid var(--border-color);
@@ -260,14 +308,14 @@ section > ul > li {
   justify-content: space-between;
 }
 
-section > ul > li:hover {
+section>ul>li:hover {
   background: rgba(255, 255, 255, 0.05);
   border-color: var(--border-accent);
   transform: translateX(8px);
   box-shadow: 0 4px 20px rgba(102, 126, 234, 0.1);
 }
 
-section > ul > li a {
+section>ul>li a {
   font-weight: 500;
 }
 
@@ -280,21 +328,21 @@ section li small {
 }
 
 /* Nested list styling */
-section > ul > li > ul {
+section>ul>li>ul {
   list-style: none;
   margin-top: 0.75rem;
   padding-left: 1.5rem;
   border-left: 2px solid var(--border-color);
 }
 
-section > ul > li > ul > li {
+section>ul>li>ul>li {
   padding: 0.5rem 0;
   background: transparent;
   border: none;
   transform: none;
 }
 
-section > ul > li > ul > li:hover {
+section>ul>li>ul>li:hover {
   background: transparent;
   border: none;
   transform: none;
@@ -333,7 +381,7 @@ section > ul > li > ul > li:hover {
 .widget:hover {
   border-color: var(--border-accent);
   transform: translateY(-4px);
-  box-shadow: 
+  box-shadow:
     0 12px 30px rgba(102, 126, 234, 0.2),
     0 0 0 1px rgba(129, 140, 248, 0.2);
 }
@@ -492,6 +540,7 @@ footer p {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -536,13 +585,13 @@ footer p {
     font-size: 1.75rem;
   }
 
-  section > ul > li {
+  section>ul>li {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
 
-  section > ul > li:hover {
+  section>ul>li:hover {
     transform: translateX(4px);
   }
 
@@ -561,5 +610,517 @@ footer p {
   header nav a {
     padding: 0.4rem 0.6rem;
     font-size: 0.8rem;
+  }
+}
+
+/* ========================================
+   Loading Screen
+   ======================================== */
+
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.loading-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--accent-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================================
+   Particle Canvas
+   ======================================== */
+
+#particles-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ========================================
+   Theme Toggle
+   ======================================== */
+
+.theme-toggle {
+  position: relative;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-accent);
+  color: var(--text-primary);
+}
+
+.theme-toggle .icon {
+  font-size: 1.1rem;
+}
+
+/* ========================================
+   Search Bar
+   ======================================== */
+
+.search-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  padding-left: 3rem;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: var(--transition-smooth);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--border-accent);
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+/* ========================================
+   Hero Section
+   ======================================== */
+
+.hero {
+  text-align: center;
+  padding: 2rem 0 3rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.hero-roles {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 600;
+  min-height: 2.5rem;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-roles .cursor {
+  display: inline-block;
+  width: 3px;
+  height: 1.2em;
+  background: var(--accent-color);
+  margin-left: 4px;
+  animation: blink 1s infinite;
+  vertical-align: text-bottom;
+}
+
+@keyframes blink {
+
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.hero-cta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: var(--primary-gradient);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.35);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: var(--bg-glass);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  border-color: var(--border-accent);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   Card Grid
+   ======================================== */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  list-style: none;
+}
+
+.card {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  border-color: var(--border-accent);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.15);
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--primary-gradient);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.card-title a {
+  color: inherit;
+}
+
+.card-title a:hover {
+  color: var(--accent-color);
+}
+
+.card-meta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.card-tag {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  background: rgba(129, 140, 248, 0.15);
+  color: var(--accent-color);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* ========================================
+   Skills Section
+   ======================================== */
+
+.skills-section {
+  margin: 2rem 0;
+}
+
+.skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  list-style: none;
+}
+
+.skill-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  transition: var(--transition-smooth);
+}
+
+.skill-item:hover {
+  border-color: var(--border-accent);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+}
+
+.skill-icon {
+  font-size: 1.25rem;
+}
+
+/* ========================================
+   Stats Widget
+   ======================================== */
+
+.stats-widget {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1.25rem;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+/* ========================================
+   Social Links
+   ======================================== */
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  transition: var(--transition-smooth);
+}
+
+.social-link:hover {
+  color: var(--accent-color);
+  border-color: var(--border-accent);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.2);
+}
+
+/* ========================================
+   Scroll Animations
+   ======================================== */
+
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.animate-on-scroll.slide-left {
+  transform: translateX(-30px);
+}
+
+.animate-on-scroll.slide-left.visible {
+  transform: translateX(0);
+}
+
+.animate-on-scroll.slide-right {
+  transform: translateX(30px);
+}
+
+.animate-on-scroll.slide-right.visible {
+  transform: translateX(0);
+}
+
+/* Stagger animation delays for children */
+.stagger-children>*:nth-child(1) {
+  transition-delay: 0.1s;
+}
+
+.stagger-children>*:nth-child(2) {
+  transition-delay: 0.15s;
+}
+
+.stagger-children>*:nth-child(3) {
+  transition-delay: 0.2s;
+}
+
+.stagger-children>*:nth-child(4) {
+  transition-delay: 0.25s;
+}
+
+.stagger-children>*:nth-child(5) {
+  transition-delay: 0.3s;
+}
+
+.stagger-children>*:nth-child(6) {
+  transition-delay: 0.35s;
+}
+
+/* ========================================
+   Utility Classes
+   ======================================== */
+
+.hidden {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* ========================================
+   Responsive Adjustments for New Components
+   ======================================== */
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 1.5rem 0 2rem;
+  }
+
+  .hero-cta {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btn {
+    width: 100%;
+    max-width: 280px;
+    justify-content: center;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-widget {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .skills-grid {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-widget {
+    grid-template-columns: 1fr;
+  }
+
+  .social-links {
+    gap: 0.75rem;
+  }
+
+  .social-link {
+    width: 36px;
+    height: 36px;
   }
 }

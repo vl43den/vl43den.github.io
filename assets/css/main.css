@@ -825,6 +825,7 @@ footer p {
   border-color: var(--border-accent);
   background: rgba(255, 255, 255, 0.05);
   transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.25);
 }
 
 /* ========================================

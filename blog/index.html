@@ -5,12 +5,22 @@ title: Blog
 
 <h1>Blog Posts</h1>
 <ul>
+  <li>
+    <a href="#">The Vital Human Element</a>
+    <small>&mdash; January 20, 2026</small>
+    <p>
+      There's a perspective that machines are nice--efficient and fast--but a 
+      <strong>human in the loop</strong> is really vital. Algorithms provide the data, 
+      but humans provide the context, empathy, and sanity checks that technology lacks.
+    </p>
+  </li>
   {% for post in site.posts %}
     <li>
       <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
       <small>&mdash; {{ post.date | date: "%B %-d, %Y" }}</small>
     </li>
   {% endfor %}
+  
   {% if site.posts == empty %}
     <li>No posts yet.</li>
   {% endif %}

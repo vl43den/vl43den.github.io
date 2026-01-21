@@ -1,5 +1,5 @@
 ---
-title: "🤚 Gesture Launcher (goreallymental)"
+title: "Gesture Launcher (goreallymental)"
 date: 2025-01-25
 tags:
   - python

@@ -3,7 +3,7 @@ layout: default
 title: About
 ---
 
-Hello! I'm Vlad, a cybersecurity enthusiast and aspiring security researcher. I created this site to share my knowledge and experiences with the community (also to mess around with creating stuff in general, so take this as a playground).
+Hello! I'm Vlad, a cybersecurity enthusiast and aspiring security researcher. I created this site to share my knowledge and experiences with the community (also to mess around with creating stuff in general + fixing code w other maintainers, so take this as a playground).
 
 ## Certifications
 

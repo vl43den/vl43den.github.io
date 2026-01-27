@@ -9,6 +9,7 @@ Hello! I'm Vlad, a cybersecurity enthusiast and aspiring security researcher. I 
 
 - **Microsoft Azure Fundamentals (AZ-900)**
 - **Microsoft Security, Compliance, and Identity Fundamentals (SC-900)**
+- **CRISAM**
 
 ## CTF Experience
 

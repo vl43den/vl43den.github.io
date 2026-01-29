@@ -13,7 +13,7 @@ Hello! I'm Vlad, a cybersecurity enthusiast and aspiring security researcher. I 
 
 ## CTF Experience
 
-I actively participate in Capture The Flag competitions to sharpen my skills in areas like web exploitation, cryptography, reverse engineering, and forensics. Check out my [write-ups](/writeups/) to see detailed solutions from events I've competed in.
+I actively participate in Capture The Flag competitions to sharpen my skills in areas like web exploitation, cryptography, reverse engineering, and forensics (love it). Check out my [write-ups](/writeups/) to see detailed solutions from events I've competed in.
 
 ---
 

@@ -19,10 +19,10 @@
                 extend: {
                     colors: {
                         cyber: {
-                            900: '#0a0a0f',
-                            800: '#12121a',
-                            700: '#1e293b',
-                            600: '#334155',
+                            900: '#07080a',
+                            800: '#0c0e11',
+                            700: '#1a1e24',
+                            600: '#2a3038',
                             500: '#475569',
                             400: '#64748b',
                             300: '#94a3b8',
@@ -30,8 +30,8 @@
                             100: '#f1f5f9'
                         },
                         neon: {
-                            cyan: '#818cf8',
-                            purple: '#764ba2',
+                            cyan: '#5eead4',
+                            purple: '#a3aab5',
                             green: '#4ade80',
                             pink: '#f472b6',
                             orange: '#fb923c',
@@ -74,7 +74,7 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: #1e293b;
+            background: #0c0e11;
         }
 
         ::-webkit-scrollbar-thumb {
@@ -89,17 +89,17 @@
         /* Glow animation */
         @keyframes glow {
             from {
-                box-shadow: 0 0 20px rgba(129, 140, 248, 0.3);
+                box-shadow: 0 0 20px rgba(94, 234, 212, 0.3);
             }
 
             to {
-                box-shadow: 0 0 30px rgba(129, 140, 248, 0.6);
+                box-shadow: 0 0 30px rgba(94, 234, 212, 0.6);
             }
         }
 
         /* Skeleton loading */
         .skeleton {
-            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+            background: linear-gradient(90deg, #1a1e24 25%, #2a3038 50%, #1a1e24 75%);
             background-size: 200% 100%;
             animation: skeleton-loading 1.5s infinite;
         }
@@ -161,18 +161,18 @@
 
         /* Search input focus */
         .search-input:focus {
-            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.3);
+            box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.3);
         }
 
         /* Filter chip active state */
         .filter-chip.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: #f1f5f9;
+            background: #5eead4;
+            color: #04110e;
         }
 
         /* Prism overrides for dark theme */
         pre[class*="language-"] {
-            background: #0a0a0f !important;
+            background: #0c0e11 !important;
             border-radius: 8px;
             margin: 0;
         }
@@ -185,14 +185,6 @@
 </head>
 
 <body class="bg-cyber-900 text-cyber-100 min-h-screen font-sans">
-    <!-- Background gradient overlay -->
-    <div class="fixed inset-0 bg-gradient-to-br from-cyber-900 via-cyber-800 to-cyber-900 pointer-events-none"></div>
-    <div
-        class="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(34,211,238,0.1)_0%,_transparent_50%)] pointer-events-none">
-    </div>
-    <div
-        class="fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(168,85,247,0.1)_0%,_transparent_50%)] pointer-events-none">
-    </div>
 
     <div class="relative z-10">
         <!-- Header -->
@@ -202,7 +194,7 @@
                     <div class="flex items-center gap-4">
                         <!-- Logo -->
                         <div
-                            class="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center shadow-lg">
+                            class="w-12 h-12 rounded-xl bg-neon-cyan flex items-center justify-center shadow-lg">
                             <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -210,7 +202,7 @@
                         </div>
                         <div>
                             <h1
-                                class="text-2xl font-bold bg-gradient-to-r from-neon-cyan to-neon-purple bg-clip-text text-transparent">
+                                class="text-2xl font-bold text-cyber-100">
                                 Sigma Search
                             </h1>
                             <p class="text-sm text-cyber-400">Detection Rules Explorer</p>
@@ -261,13 +253,13 @@
                 <div class="mt-3 flex flex-wrap gap-2">
                     <span class="text-xs text-cyber-500">Quick search:</span>
                     <button onclick="setSearch('attack.t1059')"
-                        class="text-xs text-neon-cyan hover:text-neon-purple transition-colors">T1059</button>
+                        class="text-xs text-neon-cyan hover:text-cyber-100 transition-colors">T1059</button>
                     <button onclick="setSearch('mimikatz')"
-                        class="text-xs text-neon-cyan hover:text-neon-purple transition-colors">Mimikatz</button>
+                        class="text-xs text-neon-cyan hover:text-cyber-100 transition-colors">Mimikatz</button>
                     <button onclick="setSearch('powershell')"
-                        class="text-xs text-neon-cyan hover:text-neon-purple transition-colors">PowerShell</button>
+                        class="text-xs text-neon-cyan hover:text-cyber-100 transition-colors">PowerShell</button>
                     <button onclick="setSearch('lateral movement')"
-                        class="text-xs text-neon-cyan hover:text-neon-purple transition-colors">Lateral
+                        class="text-xs text-neon-cyan hover:text-cyber-100 transition-colors">Lateral
                         Movement</button>
                 </div>
             </div>
@@ -339,7 +331,7 @@
 
                     <!-- Clear Filters -->
                     <button id="clear-filters"
-                        class="px-3 py-1.5 rounded-lg text-sm font-medium text-neon-cyan hover:text-neon-purple transition-colors hidden">
+                        class="px-3 py-1.5 rounded-lg text-sm font-medium text-neon-cyan hover:text-cyber-100 transition-colors hidden">
                         Clear All
                     </button>
                 </div>
@@ -381,7 +373,7 @@
             <!-- Load More Button -->
             <div id="load-more-container" class="mt-8 text-center hidden">
                 <button id="load-more-btn"
-                    class="px-8 py-3 bg-gradient-to-r from-neon-cyan to-neon-purple text-cyber-900 font-semibold rounded-xl hover:opacity-90 transition-opacity">
+                    class="px-8 py-3 bg-neon-cyan text-cyber-900 font-semibold rounded-xl hover:opacity-90 transition-opacity">
                     Load More Rules
                 </button>
             </div>
@@ -404,7 +396,7 @@
                 <div class="text-center">
                     <p class="text-cyber-400 text-sm">
                         Data sourced from <a href="https://github.com/SigmaHQ/sigma" target="_blank"
-                            class="text-neon-cyan hover:text-neon-purple transition-colors">SigmaHQ/sigma</a>
+                            class="text-neon-cyan hover:text-cyber-100 transition-colors">SigmaHQ/sigma</a>
                     </p>
                     <p class="text-cyber-500 text-xs mt-2">
                         Updated automatically every 24 hours via GitHub Actions

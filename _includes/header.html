@@ -1,12 +1,12 @@
-<header>
-  <nav>
-    <a href="{{ '/' | relative_url }}">Home</a>
-    <a href="{{ '/blog/' | relative_url }}">Blog</a>
-    <a href="{{ '/writeups/' | relative_url }}">Write-Ups</a>
-    <a href="{{ '/projects/' | relative_url }}">Projects</a>
-    <a href="{{ '/about/' | relative_url }}">About</a>
-    <button class="theme-toggle" aria-label="Toggle theme">
-      <span class="icon">☀️</span>
-    </button>
-  </nav>
+<header class="site-header">
+  <div class="wrap bar">
+    <a class="brand" href="{{ '/' | relative_url }}">vl43den</a>
+    <nav aria-label="Primary">
+      {% assign links = "Blog|/blog/,Write-Ups|/writeups/,Projects|/projects/,About|/about/" | split: "," %}
+      {% for link in links %}
+      {% assign parts = link | split: "|" %}
+      <a href="{{ parts[1] | relative_url }}"{% if page.url contains parts[1] %} aria-current="page"{% endif %}>{{ parts[0] }}</a>
+      {% endfor %}
+    </nav>
+  </div>
 </header>

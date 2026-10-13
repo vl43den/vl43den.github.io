@@ -1,0 +1,42 @@
+---
+layout: default
+title: Open Source
+description: "Merged pull requests to Sigma, Atomic Red Team, pySigma, Microsoft Sentinel and other projects."
+---
+
+{% assign merged = 0 %}
+{% for group in site.data.contributions %}{% assign merged = merged | plus: group.prs.size %}{% endfor %}
+
+<div class="page-head">
+  <h1>Open source</h1>
+  <p>{{ merged }} pull requests merged into {{ site.data.contributions | size }} upstream projects, mostly detection content and the tooling around it.</p>
+</div>
+
+{% for group in site.data.contributions %}
+<section class="section" id="{{ group.repo | slugify }}">
+  <div class="section-head">
+    <h2>{{ group.repo }}</h2>
+    <a href="https://github.com/{{ group.repo }}/pulls?q=is%3Apr+author%3Avl43den" target="_blank" rel="noopener">{{ group.prs.size }} merged &nearr;</a>
+  </div>
+  <p class="section-note">{{ group.about }}</p>
+  <ul class="rows">
+    {% for pr in group.open %}
+    <li>
+      <a class="row" href="https://github.com/{{ group.repo }}/pull/{{ pr.num }}" target="_blank" rel="noopener">
+        <span class="row-title">{{ pr.title }}</span>
+        <span class="row-meta">#{{ pr.num }} &middot; {{ pr.date | date: "%b %Y" }}</span>
+        <span class="tags"><span class="tag">in review</span></span>
+      </a>
+    </li>
+    {% endfor %}
+    {% for pr in group.prs %}
+    <li>
+      <a class="row" href="https://github.com/{{ group.repo }}/pull/{{ pr.num }}" target="_blank" rel="noopener">
+        <span class="row-title">{{ pr.title }}</span>
+        <span class="row-meta">#{{ pr.num }} &middot; {{ pr.date | date: "%b %Y" }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endfor %}

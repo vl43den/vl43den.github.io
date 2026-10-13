@@ -4,19 +4,29 @@ title: Home
 ---
 
 {% assign events = site.ctfs | group_by: 'event' %}
+{% assign merged = 0 %}
+{% for group in site.data.contributions %}{% assign merged = merged | plus: group.prs.size %}{% endfor %}
 
 <section class="hero">
   <p class="eyebrow accent">Detection engineering &middot; Security research</p>
   <h1>vl43den</h1>
   <p class="lede">
-    I'm Vlad. I build detection tooling around Sigma, play CTFs, and write up what I learn along the way.
+    Hi there, I'm Vlad. I build detection tooling around Sigma, play CTFs, and write up what I learn along the way. (There's bursts of energy to all of this, maybe depending on caffeine)
   </p>
   <div class="hero-cta">
-    <a href="{{ '/sigma-search/' | relative_url }}" class="btn btn-primary">Try Sigma Search</a>
-    <a href="{{ '/writeups/' | relative_url }}" class="btn">Read write-ups</a>
+    <a href="{{ '/contributions/' | relative_url }}" class="btn btn-primary">See contributions</a>
+    <a href="{{ '/sigma-search/' | relative_url }}" class="btn">Try Sigma Search</a>
   </div>
 
   <div class="stats">
+    <div class="stat">
+      <div class="stat-value">{{ merged }}</div>
+      <div class="stat-label">Upstream PRs merged</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">{{ site.data.contributions | size }}</div>
+      <div class="stat-label">Open-source projects</div>
+    </div>
     <div class="stat">
       <div class="stat-value">3,000+</div>
       <div class="stat-label">Sigma rules searchable</div>
@@ -25,15 +35,25 @@ title: Home
       <div class="stat-value">{{ site.ctfs | size }}</div>
       <div class="stat-label">CTF write-ups</div>
     </div>
-    <div class="stat">
-      <div class="stat-value">{{ events | size }}</div>
-      <div class="stat-label">CTF events</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">{{ site.projects | size | plus: 2 }}</div>
-      <div class="stat-label">Projects</div>
-    </div>
   </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>Open source</h2>
+    <a href="{{ '/contributions/' | relative_url }}">All {{ merged }} merged PRs &rarr;</a>
+  </div>
+  <ul class="rows">
+    {% for group in site.data.contributions %}
+    <li>
+      <a class="row" href="{{ '/contributions/' | relative_url }}#{{ group.repo | slugify }}">
+        <span class="row-title">{{ group.repo }}</span>
+        <span class="row-meta">{{ group.prs.size }} merged</span>
+        <span class="row-desc">{{ group.about }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
 </section>
 
 <section class="section">
@@ -46,7 +66,7 @@ title: Home
       <a class="row" href="{{ '/sigma-search/' | relative_url }}">
         <span class="row-title">Sigma Search Engine</span>
         <span class="row-meta">2026</span>
-        <span class="row-desc">Instant fuzzy search across the SigmaHQ ruleset. Filter by severity and product, look up ATT&amp;CK technique IDs, and read the rule YAML. Data refreshes daily via GitHub Actions.</span>
+        <span class="row-desc">Instant fuzzy search across the SigmaHQ ruleset. Filter by severity and product, look up ATT&amp;CK technique IDs, and read the rule YAML. Checked daily for upstream changes via GitHub Actions.</span>
         <span class="tags"><span class="tag live">live</span><span class="tag">fuse.js</span><span class="tag">sigma</span><span class="tag">github actions</span></span>
       </a>
     </li>
@@ -80,7 +100,7 @@ title: Home
     <li>
       <time>{{ item.date }}</time>
       <div class="tl-body">
-        <div class="tl-title">{% if item.url %}<a href="{{ item.url | relative_url }}">{{ item.title }}</a>{% else %}{{ item.title }}{% endif %}</div>
+        <div class="tl-title">{% if item.url contains '://' %}<a href="{{ item.url }}" target="_blank" rel="noopener">{{ item.title }}</a>{% elsif item.url %}<a href="{{ item.url | relative_url }}">{{ item.title }}</a>{% else %}{{ item.title }}{% endif %}</div>
         <p class="tl-desc">{{ item.desc }}</p>
       </div>
     </li>

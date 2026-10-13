@@ -3,25 +3,24 @@ layout: default
 title: Blog
 ---
 
-<h1>Blog Posts</h1>
-<ul>
+<div class="page-head">
+  <h1>Blog</h1>
+</div>
+
+<ul class="rows">
   <li>
-    <a href="#">The Vital Human Element</a>
-    <small>&mdash; January 20, 2026</small>
-    <p>
-      There's a perspective that machines are nice--efficient and fast--but a 
-      <strong>human in the loop</strong> is really vital. Algorithms provide the data, 
-      but humans provide the context, empathy, and sanity checks that technology lacks.
-    </p>
+    <div class="row">
+      <span class="row-title">The Vital Human Element</span>
+      <span class="row-meta">Jan 20, 2026</span>
+      <span class="row-desc">Machines are efficient and fast, but a human in the loop is vital. Algorithms provide the data; humans provide the context, empathy, and sanity checks that technology lacks.</span>
+    </div>
   </li>
   {% for post in site.posts %}
-    <li>
-      <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-      <small>&mdash; {{ post.date | date: "%B %-d, %Y" }}</small>
-    </li>
+  <li>
+    <a class="row" href="{{ post.url | relative_url }}">
+      <span class="row-title">{{ post.title }}</span>
+      <span class="row-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+    </a>
+  </li>
   {% endfor %}
-  
-  {% if site.posts == empty %}
-    <li>No posts yet.</li>
-  {% endif %}
 </ul>

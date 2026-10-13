@@ -1,5 +1,6 @@
 ---
 title: "Gesture Launcher (goreallymental)"
+description: "Control your computer with hand gestures: MediaPipe hand tracking mapped to app launches."
 date: 2025-01-25
 tags:
   - python

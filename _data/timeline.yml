@@ -1,0 +1,18 @@
+# Newest first. Add an entry here and it shows up on the homepage.
+# Fields: date (free text), title, desc, url (optional)
+- date: "Jan 2026"
+  title: "Sigma Search Engine"
+  desc: "Static search UI over 3,000+ Sigma detection rules. Fuzzy search, ATT&CK ID lookup, severity/product filters. Rules refresh daily through GitHub Actions."
+  url: /sigma-search/
+- date: "Jan 2026"
+  title: "Earned CRISAM, SC-900 and AZ-900"
+  desc: "Added to the about page alongside the Microsoft security and cloud fundamentals."
+  url: /about/
+- date: "Jan 2026"
+  title: "Launched the blog"
+  desc: "First post: The Vital Human Element."
+  url: /blog/
+- date: "Dec 2025"
+  title: "PySigma for LogPoint"
+  desc: "Sigma-to-LogPoint conversion that runs entirely in the browser via Pyodide, with Linux pipeline support."
+  url: /converter-lp/

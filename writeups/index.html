@@ -3,13 +3,20 @@ layout: default
 title: Write-Ups
 ---
 
-<h1>CTF Write-Ups</h1>
+<div class="page-head">
+  <h1>CTF write-ups</h1>
+  <p>Walkthroughs from the competitions I've played, grouped by event.</p>
+</div>
+
 {% assign by_event = site.ctfs | group_by: 'event' %}
-<ul>
-{% for event in by_event %}
-  <li><a href="{{ '/writeups/' | append: event.name | append: '/' | relative_url }}">{{ event.name | capitalize }}</a> <small>({{ event.items | size }})</small></li>
-{% endfor %}
-{% if by_event == empty %}
-  <li>No write-ups yet.</li>
-{% endif %}
+<ul class="rows">
+  {% for event in by_event %}
+  <li>
+    <a class="row" href="{{ '/writeups/' | append: event.name | append: '/' | relative_url }}">
+      <span class="row-title">{{ event.name | upcase }}</span>
+      <span class="row-meta">{{ event.items | size }} challenge{% if event.items.size != 1 %}s{% endif %}</span>
+    </a>
+  </li>
+  {% endfor %}
 </ul>
+{% if by_event.size == 0 %}<p class="empty">No write-ups yet.</p>{% endif %}

@@ -1,24 +1,29 @@
 # Newest first. Add an entry here and it shows up on the homepage.
 # Fields: date (free text), title, desc, url (optional; internal path or full https:// link)
+# Upstream PRs are dated by when they merged.
+- date: "Oct 2026"
+  title: "Sentinel KQL validation schema update merged"
+  desc: "Added the IdentityInfo columns to the KqlValidations schema in Azure/Azure-Sentinel. Earlier in the month, the Kerberos ticket request rule fix merged into SigmaHQ/sigma."
+  url: https://github.com/Azure/Azure-Sentinel/pull/15418
 - date: "Sep 2026"
   title: "Sentinel hunting query fix merged"
-  desc: "Repaired the entity mappings in hunt_LOLBins.yaml in Azure/Azure-Sentinel. Same month: a Kerberos ticket request rule fix merged into SigmaHQ/sigma."
+  desc: "Repaired the entity mappings in hunt_LOLBins.yaml in Azure/Azure-Sentinel."
   url: https://github.com/Azure/Azure-Sentinel/pull/15144
-- date: "May 2026"
+- date: "May – Jun 2026"
   title: "Trap DEBUG atomic test and UFW rule fix"
-  desc: "Added T1546.005-5 to Atomic Red Team and fixed the broken ufw-init detection in the Sigma UFW Disable Attempt rule."
+  desc: "T1546.005-5 merged into Atomic Red Team in May; the ufw-init fix to the Sigma UFW Disable Attempt rule followed in June."
   url: https://github.com/redcanaryco/atomic-red-team/pull/3338
 - date: "Mar – Apr 2026"
   title: "Three PRs merged into NVIDIA/NemoClaw"
   desc: "Auto-created swap on low-memory VMs to stop OOM during sandbox builds, fixed a file descriptor leak, and expanded the network-policy docs."
   url: /contributions/#nvidia-nemoclaw
-- date: "Feb 2026"
-  title: "Linux/auditd pipeline for the Logpoint backend"
-  desc: "Merged upstream into logpoint/pySigma-backend-logpoint, alongside new T1027 obfuscation tests in Atomic Red Team."
+- date: "Feb – Mar 2026"
+  title: "pySigma 1.0 and a Linux/auditd pipeline for the Logpoint backend"
+  desc: "Both merged upstream into logpoint/pySigma-backend-logpoint. New T1027 obfuscation tests landed in Atomic Red Team in March."
   url: https://github.com/logpoint/pySigma-backend-logpoint/pull/33
 - date: "Jan 2026"
   title: "Fixes in pySigma core and the Elasticsearch backend"
-  desc: "Stopped SigmaString values being re-parsed in pySigma, and fixed SigmaNull conversion in the ECS Windows pipeline."
+  desc: "Stopped SigmaString values being re-parsed in pySigma and fixed SigmaNull conversion in the ECS Windows pipeline. The Chaos/Darkside Sigma rule and three Atomic Red Team tests also merged this month."
   url: https://github.com/SigmaHQ/pySigma/pull/433
 - date: "Jan 2026"
   title: "Sigma Search Engine"
@@ -34,9 +39,9 @@
   url: /blog/
 - date: "Dec 2025"
   title: "PySigma for LogPoint"
-  desc: "Sigma-to-LogPoint conversion that runs entirely in the browser via Pyodide, and the pySigma 1.0 upgrade merged into the backend."
+  desc: "Sigma-to-LogPoint conversion that runs entirely in the browser via Pyodide. The ConditionNOT refactor merged into the Logpoint backend the same month."
   url: /converter-lp/
-- date: "Aug – Nov 2025"
+- date: "Oct – Nov 2025"
   title: "First upstream detections"
-  desc: "Five rule contributions merged into SigmaHQ/sigma and three atomic tests into Atomic Red Team."
+  desc: "Four rule contributions merged into SigmaHQ/sigma in October, followed by two Atomic Red Team tests in November."
   url: /contributions/

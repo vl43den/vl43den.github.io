@@ -1,29 +1,30 @@
-# Merged upstream pull requests, newest first within each project.
-# Add a PR under `prs` (merged) or `open` (still in review) and the homepage
-# counts and the /contributions/ page update themselves.
+# Upstream pull requests, newest first within each project.
+# `prs` are merged (date = merge date); `open` are still in review (date = opened).
+# Add a PR to either list and the homepage counts and the /contributions/ page
+# update themselves.
 - repo: SigmaHQ/sigma
   about: "New detection rules and fixes to existing ones in the main Sigma rule repository."
   prs:
     - num: 6296
-      date: "2026-09-14"
+      date: "2026-10-02"
       title: "Suspicious Kerberos Ticket Request (ScriptBlock + CLI): remove the .GetRequest() requirement"
     - num: 5978
-      date: "2026-05-02"
+      date: "2026-06-11"
       title: "UFW Disable Attempt: fix broken ufw-init detection and broaden coverage"
     - num: 5767
-      date: "2025-11-20"
-      title: "New rule: Chaos/Darkside ransomware-style hidden cmd launch"
-    - num: 5677
-      date: "2025-10-03"
-      title: "Modify System Firewall: add nftables delete/flush to the selection set"
-    - num: 5675
-      date: "2025-10-03"
-      title: "LSASS procdump: additional flags and service names"
+      date: "2026-01-26"
+      title: "New rule: Chaos/Darkside ransomware-style hidden cmd launching suspicious targets"
     - num: 5600
-      date: "2025-08-18"
+      date: "2025-10-28"
       title: "Syslog clearing: add variants and empty-file idioms"
+    - num: 5675
+      date: "2025-10-20"
+      title: "LSASS procdump: additional flags and service names"
+    - num: 5677
+      date: "2025-10-17"
+      title: "Modify System Firewall: add nftables delete/flush to the selection set"
     - num: 5594
-      date: "2025-08-13"
+      date: "2025-10-01"
       title: "PowerShell script rules: add CIM alias"
   open:
     - num: 6359
@@ -37,55 +38,69 @@
   about: "Atomic tests mapped to MITRE ATT&CK techniques, across Windows, Linux, macOS and FreeBSD."
   prs:
     - num: 3338
-      date: "2026-05-07"
+      date: "2026-05-24"
       title: "T1546.005: add Trap DEBUG atomic test"
     - num: 3279
-      date: "2026-02-08"
+      date: "2026-03-18"
       title: "T1027 / T1027.013: character array and password-protected ZIP obfuscation tests"
     - num: 3275
-      date: "2026-01-18"
+      date: "2026-01-19"
       title: "T1496 Resource Hijacking: Windows CPU load simulation"
     - num: 3256
-      date: "2025-12-10"
+      date: "2026-01-06"
       title: "T1113: RDP bitmap cache extraction test"
+    - num: 3231
+      date: "2026-01-06"
+      title: "T1003.007: refactor FreeBSD heap memory dumping in dump_heap.py"
     - num: 3252
-      date: "2025-12-06"
+      date: "2025-12-13"
       title: "T1652: device driver discovery for Linux and macOS"
     - num: 3237
-      date: "2025-11-26"
+      date: "2025-11-29"
       title: "T1049: process-aware, cross-platform network discovery"
-    - num: 3231
-      date: "2025-11-17"
-      title: "T1003.007: refactor FreeBSD heap memory dumping in dump_heap.py"
     - num: 3229
-      date: "2025-11-14"
+      date: "2025-11-29"
       title: "T1007: service discovery methods across platforms"
 
 - repo: logpoint/pySigma-backend-logpoint
   about: "The pySigma backend that converts Sigma rules into Logpoint queries."
   prs:
     - num: 33
-      date: "2026-02-28"
+      date: "2026-03-11"
       title: "Add Linux/auditd pipeline"
     - num: 28
-      date: "2025-12-29"
+      date: "2026-02-20"
       title: "Upgrade to pySigma v1.0.0"
     - num: 23
-      date: "2025-11-22"
+      date: "2025-12-03"
       title: "Refactor ConditionNOT formatting"
 
 - repo: NVIDIA/NemoClaw
   about: "Reliability fixes and docs for NVIDIA's plugin for secure OpenClaw installs."
   prs:
     - num: 1981
-      date: "2026-04-16"
+      date: "2026-04-21"
       title: "Docs: expand the network-policy management guide"
     - num: 1052
-      date: "2026-03-28"
+      date: "2026-03-30"
       title: "Fix file descriptor leak in acquireOnboardLock"
     - num: 419
-      date: "2026-03-19"
+      date: "2026-03-30"
       title: "Preflight: auto-create swap on low-memory VMs to prevent OOM during sandbox build"
+
+- repo: Azure/Azure-Sentinel
+  about: "Hunting queries, analytics and validation tooling for Microsoft Sentinel."
+  prs:
+    - num: 15418
+      date: "2026-10-26"
+      title: "KqlValidations schema: add Sentinel IdentityInfo columns"
+    - num: 15144
+      date: "2026-09-22"
+      title: "hunt_LOLBins.yaml: repair entity mappings"
+  open:
+    - num: 15290
+      date: "2026-10-08"
+      title: "Fix riskysignins delta"
 
 - repo: SigmaHQ/pySigma
   about: "The core library that parses Sigma rules and converts them to queries."
@@ -98,16 +113,5 @@
   about: "The Elasticsearch backend for pySigma."
   prs:
     - num: 174
-      date: "2026-01-19"
+      date: "2026-01-21"
       title: "Fix SigmaNull conversion in the ECS Windows pipeline"
-
-- repo: Azure/Azure-Sentinel
-  about: "Hunting queries and analytics for Microsoft Sentinel."
-  prs:
-    - num: 15144
-      date: "2026-09-16"
-      title: "hunt_LOLBins.yaml: repair entity mappings"
-  open:
-    - num: 15290
-      date: "2026-10-08"
-      title: "Fix riskysignins delta"
